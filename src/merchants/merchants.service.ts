@@ -7,11 +7,11 @@ export class MerchantsService {
     private readonly mockMerchantsRepository: MockMerchantsRepository,
   ) {}
 
-  async getMerchants(): Promise<Trader[]> {
+  async getMerchants(): Promise<Merchant[]> {
     return this.mockMerchantsRepository.getMerchants();
   }
 
-  async getMerchantById(id: number): Promise<Trader> {
+  async getMerchantById(id: number): Promise<Merchant> {
     return this.mockMerchantsRepository.getMerchantById(id);
   }
 }

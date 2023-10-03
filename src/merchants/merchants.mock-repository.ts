@@ -1,5 +1,5 @@
-import { faker } from '@faker-js/faker';
 import { Injectable, Logger } from '@nestjs/common';
+import { generateMerchants } from './utils/generate-merchants';
 
 @Injectable()
 export class MockMerchantsRepository {
@@ -7,21 +7,8 @@ export class MockMerchantsRepository {
   private merchants: Merchant[] = [];
 
   constructor() {
-    const mockMerchantsCount = 10;
-    this.merchants = this.generateMerchants(mockMerchantsCount);
-    this.logger.debug(`Создано ${mockMerchantsCount} тестовых мерчантов`);
-  }
-
-  private generateMerchants(count: number): Merchant[] {
-    const merchants: Merchant[] = [];
-    for (let i = 0; i < count; i++) {
-      const trader: Merchant = {
-        id: faker.number.int({ min: 1000000000, max: 2000000000 }),
-        name: faker.internet.userName(),
-      };
-      merchants.push(trader);
-    }
-    return merchants;
+    this.merchants = generateMerchants({ min: 4, max: 10 });
+    this.logger.debug(`Создано ${this.merchants.length} тестовых мерчантов`);
   }
 
   async getMerchants(): Promise<Merchant[]> {

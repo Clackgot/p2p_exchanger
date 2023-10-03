@@ -1,5 +1,5 @@
-import { faker } from '@faker-js/faker';
 import { Injectable, Logger } from '@nestjs/common';
+import { generateTraders } from './utils/generate-traders';
 
 @Injectable()
 export class MockTradersRepository {
@@ -7,21 +7,8 @@ export class MockTradersRepository {
   private traders: Trader[] = [];
 
   constructor() {
-    const mockTradersCount = 10;
-    this.traders = this.generateTraders(mockTradersCount);
-    this.logger.debug(`Создано ${mockTradersCount} тестовых трейдеров`);
-  }
-
-  private generateTraders(count: number): Trader[] {
-    const traders: Trader[] = [];
-    for (let i = 0; i < count; i++) {
-      const trader: Trader = {
-        id: faker.number.int({ min: 1000000000, max: 2000000000 }),
-        name: faker.internet.userName(),
-      };
-      traders.push(trader);
-    }
-    return traders;
+    this.traders = generateTraders({ min: 4, max: 10 });
+    this.logger.debug(`Создано ${this.traders.length} тестовых трейдеров`);
   }
 
   async getTraders(): Promise<Trader[]> {
