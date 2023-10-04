@@ -2,26 +2,24 @@ import { Injectable, Logger } from '@nestjs/common';
 // import * as TronWeb from 'tronweb';
 import * as TronWeb from 'tronweb';
 
-
-class AddressInfo{
+class AddressInfo {
   transactions: number;
   date_created: Date;
 }
 
 interface ITronscanService {
-  getAddressInfo(address: string):AddressInfo;
+  getAddressInfo(address: string): AddressInfo;
 }
-
 
 @Injectable()
 export class TronscanService implements ITronscanService {
   private logger = new Logger('TronscanService');
   constructor() {
-    console.log(this.getAddressInfo("TMCbjVa5kjF2JHhgcQzRhq8DneTC7x4Bit"))
+    console.log(this.getAddressInfo('TMCbjVa5kjF2JHhgcQzRhq8DneTC7x4Bit'));
   }
 
-  getAddressInfo(address: string): AddressInfo{
-    return {date_created: new Date(), transactions: 5};
+  getAddressInfo(address: string): AddressInfo {
+    return { date_created: new Date(), transactions: 5 };
   }
 
   // async hello(): Promise<void> {
