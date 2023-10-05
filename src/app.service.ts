@@ -8,7 +8,7 @@ export class AppService {
   constructor() {
     this.logger.debug(constants.TRONGRID.TRONGRID_NILE_URL);
   }
-  getHello(): string {
-    return 'Hello World!';
+  getApiInfo(): string {
+    return 'USDT Exchanger';
   }
 }
