@@ -5,7 +5,7 @@ import { ExchangerModule } from './exchanger/exchanger.module';
 import { TradersModule } from './traders/traders.module';
 import { MerchantsModule } from './merchants/merchants.module';
 import { TronscanModule } from './tronscan/tronscan.module';
-import { ConfigModule } from '@nestjs/config';
+import { CoreConfigModule } from './core-config/core-config.module';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import { ConfigModule } from '@nestjs/config';
     TradersModule,
     MerchantsModule,
     TronscanModule,
-    ConfigModule.forRoot({ isGlobal: true }),
+    CoreConfigModule,
   ],
   controllers: [AppController],
   providers: [AppService],

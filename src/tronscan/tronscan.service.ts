@@ -1,6 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-// import * as TronWeb from 'tronweb';
-import * as TronWeb from 'tronweb';
 
 class AddressInfo {
   transactions: number;
