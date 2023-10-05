@@ -3,10 +3,10 @@ import constants from './config/constants';
 
 @Injectable()
 export class AppService {
-  private logger: Logger = new Logger(this.constructor.name);;
+  private logger: Logger = new Logger(this.constructor.name);
 
   constructor() {
-    this.logger.debug(constants.TRONGRID_MAINNET_URL)
+    this.logger.debug(constants.TRONGRID.TRONGRID_NILE_URL);
   }
   getHello(): string {
     return 'Hello World!';
