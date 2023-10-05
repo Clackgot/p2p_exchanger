@@ -1,7 +1,7 @@
 import { plainToInstance } from 'class-transformer';
 import { ValidateNested, validateSync, IsUrl, Matches } from 'class-validator';
 import { config } from 'dotenv';
-import { trongridAuthKeyRegex } from './regexp';
+import { IsTrongridAuthKey } from './decorators';
 config();
 
 class TrongridConfig {
@@ -11,10 +11,7 @@ class TrongridConfig {
   TRONGRID_SHASTA_URL: string;
   @IsUrl()
   TRONGRID_NILE_URL: string;
-  @Matches(trongridAuthKeyRegex, {
-    message: 'Неверный формат токена',
-    always: true,
-  })
+  @IsTrongridAuthKey()
   TRONGRID_API_KEY: string;
 }
 
