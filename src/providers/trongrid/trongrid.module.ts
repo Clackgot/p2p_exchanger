@@ -17,4 +17,12 @@ import { errorMessages } from 'src/constants/errorMessages';
   ],
   providers: [TrongridService],
 })
-export class TrongridModule {}
+export class TrongridModule {
+  constructor(private readonly trongridService: TrongridService) {
+    trongridService
+      .getAddressInfo(applicationConstants.ROOT_TRON_ADDRESS)
+      .then((data) => {
+        console.log(data);
+      });
+  }
+}

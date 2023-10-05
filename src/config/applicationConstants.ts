@@ -1,7 +1,7 @@
 import { plainToInstance } from 'class-transformer';
 import { ValidateNested, validateSync, IsUrl, IsEnum } from 'class-validator';
 import { config } from 'dotenv';
-import { IsTrongridAuthKey } from './decorators';
+import { IsTronAddress, IsTrongridAuthKey } from './decorators';
 import { Logger } from '@nestjs/common';
 import { ApplicationEnviroment } from './enums';
 import { TronNet } from 'src/enums/enums';
@@ -37,6 +37,12 @@ class ApplicationConstants {
     message: `CURRENT_TRON_NET должно быть: [${Object.keys(TronNet)}]`,
   })
   CURRENT_TRON_NET: TronNet;
+
+  @IsTronAddress()
+  ROOT_TRON_ADDRESS: string;
+
+  @IsTronAddress()
+  TETHER_USDT_TOKEN_ADDRESS: string;
 }
 
 let applicationConstants: ApplicationConstants = {
@@ -50,6 +56,9 @@ let applicationConstants: ApplicationConstants = {
 
   ENVIROMENT: process.env.APPLICATION_ENVIROMENT as ApplicationEnviroment,
   CURRENT_TRON_NET: process.env.CURRENT_TRON_NET as TronNet,
+
+  ROOT_TRON_ADDRESS: process.env.ROOT_TRON_ADDRESS,
+  TETHER_USDT_TOKEN_ADDRESS: process.env.TETHER_USDT_TOKEN_ADDRESS,
 };
 
 applicationConstants = plainToInstance(
