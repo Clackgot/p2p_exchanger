@@ -4,8 +4,8 @@ import { AppService } from './app.service';
 import { ExchangerModule } from './exchanger/exchanger.module';
 import { TradersModule } from './traders/traders.module';
 import { MerchantsModule } from './merchants/merchants.module';
-import { TronscanModule } from './tronscan/tronscan.module';
-import { CoreConfigModule } from './core-config/core-config.module';
+import { TronscanModule } from './providers/tronscan/tronscan.module';
+import { TrongridModule } from './providers/trongrid/trongrid.module';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import { CoreConfigModule } from './core-config/core-config.module';
     TradersModule,
     MerchantsModule,
     TronscanModule,
-    CoreConfigModule,
+    TrongridModule,
   ],
   controllers: [AppController],
   providers: [AppService],
