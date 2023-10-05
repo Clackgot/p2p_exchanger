@@ -52,7 +52,6 @@ constants = plainToInstance(ApplicationConstants, constants, {
 
 const errors = validateSync(constants, { skipMissingProperties: false });
 if (errors.length > 0) {
-  console.log(errors.toString());
   throw new Error(errors.toString());
 }
 
