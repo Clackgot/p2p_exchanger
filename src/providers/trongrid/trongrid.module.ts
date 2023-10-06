@@ -20,7 +20,7 @@ import { errorMessages } from 'src/constants/errorMessages';
 export class TrongridModule {
   constructor(private readonly trongridService: TrongridService) {
     trongridService
-      .getAddressInfo(applicationConstants.ROOT_TRON_ADDRESS)
+      .getAddressInfo(applicationConstants.STORAGE.ADDRESS)
       .then((data) => {
         console.log(data);
       });

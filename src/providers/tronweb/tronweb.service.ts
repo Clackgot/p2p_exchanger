@@ -15,17 +15,25 @@ interface TronAccount {
 
 @Injectable()
 export class TronwebService {
+  private tronWeb = new TronWeb({
+    fullHost: applicationConstants.TRONGRID.TRONGRID_API_URL,
+    headers: {
+      'TRON-PRO-API-KEY': applicationConstants.TRONGRID.TRONGRID_API_KEY,
+    },
+  });
+
+  fromMnemonic(mnimonic: string): TronAccount {
+    const account = this.tronWeb.fromMnemonic(mnimonic);
+
+    return account;
+  }
+
   generateAddress(): TronAccount {
-    const tronWeb = new TronWeb({
-      fullHost: applicationConstants.TRONGRID.TRONGRID_API_URL,
-      headers: {
-        'TRON-PRO-API-KEY': applicationConstants.TRONGRID.TRONGRID_API_KEY,
-      },
-    });
-    const account = tronWeb.createAccount();
+    const account = this.tronWeb.createRandom();
+
     return account;
   }
   onModuleInit() {
-    this.generateAddress();
+    console.log(this.generateAddress());
   }
 }

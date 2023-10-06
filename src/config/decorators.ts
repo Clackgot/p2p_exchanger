@@ -1,8 +1,12 @@
 import { Matches } from 'class-validator';
-import { tronAddressRegex, trongridAuthKeyRegex } from './regexp';
+import {
+  tronAddressRegex,
+  trongridAuthKeyRegex,
+  tronPrivateKeyRegex,
+} from './regexp';
 
 export function IsTrongridAuthKey(): PropertyDecorator {
-  return function (target: Object, propertyKey: string | symbol): void {
+  return function (target: object, propertyKey: string | symbol): void {
     Matches(trongridAuthKeyRegex, {
       message: 'Неверный формат токена',
       always: true,
@@ -11,9 +15,18 @@ export function IsTrongridAuthKey(): PropertyDecorator {
 }
 
 export function IsTronAddress(): PropertyDecorator {
-  return function (target: Object, propertyKey: string | symbol): void {
+  return function (target: object, propertyKey: string | symbol): void {
     Matches(tronAddressRegex, {
       message: 'Неверный формат TRON адреса',
+      always: true,
+    })(target, propertyKey);
+  };
+}
+
+export function IsTronPrivateKey(): PropertyDecorator {
+  return function (target: object, propertyKey: string | symbol): void {
+    Matches(tronPrivateKeyRegex, {
+      message: 'Неверный формат приватного ключа',
       always: true,
     })(target, propertyKey);
   };

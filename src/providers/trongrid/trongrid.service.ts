@@ -31,6 +31,7 @@ export class TrongridService {
 
     const trxBalance = data?.data[0]?.balance / 1_000_000;
 
+    // TODO: Добавить проверку на NaN. Если аккаунт не активирован все балансы равны NaN
     return {
       address,
       usdtTetherBalance,
