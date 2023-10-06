@@ -6,6 +6,7 @@ import applicationConstants from 'src/config/applicationConstants';
 interface AddressInfo {
   address: string;
   usdtTetherBalance: number;
+  trxBalance: number;
 }
 @Injectable()
 export class TrongridService {
@@ -23,14 +24,17 @@ export class TrongridService {
       ),
     );
     const trc20_tokens: any[] = data?.data[0]?.trc20 ?? [];
-    const usdtBalanceInfo = trc20_tokens.find((token) =>
-      token.hasOwnProperty(applicationConstants.TETHER_USDT_TOKEN_ADDRESS),
-    );
+    const usdtTetherBalance =
+      trc20_tokens.find((token) =>
+        token.hasOwnProperty(applicationConstants.TETHER_USDT_TOKEN_ADDRESS),
+      )?.[applicationConstants.TETHER_USDT_TOKEN_ADDRESS] / 1_000_000 ?? 0;
+
+    const trxBalance = data?.data[0]?.balance / 1_000_000;
 
     return {
       address,
-      usdtTetherBalance:
-        usdtBalanceInfo?.[applicationConstants.TETHER_USDT_TOKEN_ADDRESS] ?? 0,
+      usdtTetherBalance,
+      trxBalance,
     };
   }
 }
