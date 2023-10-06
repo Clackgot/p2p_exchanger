@@ -15,7 +15,7 @@ export class MockMerchantsRepository {
     return this.merchants;
   }
 
-  async getMerchantById(id: number): Promise<Merchant> {
+  async getMerchantById(id: number): Promise<Merchant | undefined> {
     return this.merchants.find((t) => t.id === id);
   }
 }

@@ -13,7 +13,7 @@ export class TrongridService {
 
   constructor(private readonly httpService: HttpService) {}
 
-  async getAddressInfo(address: string): Promise<any> {
+  async getAddressInfo(address: string): Promise<AddressInfo> {
     const { data } = await firstValueFrom(
       this.httpService.get(`v1/accounts/${address}`).pipe(
         catchError((error) => {
@@ -23,15 +23,14 @@ export class TrongridService {
       ),
     );
     const trc20_tokens: any[] = data?.data[0]?.trc20 ?? [];
-
-    const usdtTetherBalance =
-      trc20_tokens.map(
-        (token) => token?.[applicationConstants.TETHER_USDT_TOKEN_ADDRESS],
-      )?.[0] ?? 0;
+    const usdtBalanceInfo = trc20_tokens.find((token) =>
+      token.hasOwnProperty(applicationConstants.TETHER_USDT_TOKEN_ADDRESS),
+    );
 
     return {
       address,
-      usdtTetherBalance: usdtTetherBalance / 1_000_000,
+      usdtTetherBalance:
+        usdtBalanceInfo?.[applicationConstants.TETHER_USDT_TOKEN_ADDRESS] ?? 0,
     };
   }
 }

@@ -15,7 +15,7 @@ export class MockTradersRepository {
     return this.traders;
   }
 
-  async getTraderById(id: number): Promise<Trader> {
+  async getTraderById(id: number): Promise<Trader | undefined> {
     return this.traders.find((t) => t.id === id);
   }
 }

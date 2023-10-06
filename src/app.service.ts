@@ -6,7 +6,7 @@ import { ApplicationEnviroment } from './config/enums';
 export class AppService {
   private logger: Logger = new Logger(this.constructor.name);
 
-  constructor() {
+  onModuleInit() {
     switch (applicationConstants.ENVIROMENT) {
       case ApplicationEnviroment.develop: {
         this.logger.debug(`Запущено в окружении разработки`);

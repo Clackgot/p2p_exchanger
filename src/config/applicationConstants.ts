@@ -47,18 +47,18 @@ class ApplicationConstants {
 
 let applicationConstants: ApplicationConstants = {
   TRONGRID: {
-    TRONGRID_API_URL: process.env.TRONGRID_API_URL,
-    TRONGRID_API_KEY: process.env.TRONGRID_API_KEY,
+    TRONGRID_API_URL: process.env.TRONGRID_API_URL as string,
+    TRONGRID_API_KEY: process.env.TRONGRID_API_KEY as string,
   },
   TRONSCAN: {
-    TRONSCAN_API_URL: process.env.TRONSCAN_API_URL,
+    TRONSCAN_API_URL: process.env.TRONSCAN_API_URL as string,
   },
 
   ENVIROMENT: process.env.APPLICATION_ENVIROMENT as ApplicationEnviroment,
   CURRENT_TRON_NET: process.env.CURRENT_TRON_NET as TronNet,
 
-  ROOT_TRON_ADDRESS: process.env.ROOT_TRON_ADDRESS,
-  TETHER_USDT_TOKEN_ADDRESS: process.env.TETHER_USDT_TOKEN_ADDRESS,
+  ROOT_TRON_ADDRESS: process.env.ROOT_TRON_ADDRESS as string,
+  TETHER_USDT_TOKEN_ADDRESS: process.env.TETHER_USDT_TOKEN_ADDRESS as string,
 };
 
 applicationConstants = plainToInstance(

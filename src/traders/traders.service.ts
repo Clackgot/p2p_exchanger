@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { MockTradersRepository } from './traders.mock-repository';
 
 @Injectable()
@@ -10,6 +10,8 @@ export class TradersService {
   }
 
   async getTraderById(id: number): Promise<Trader> {
-    return this.repository.getTraderById(id);
+    const trader: Trader | undefined = await this.repository.getTraderById(id);
+    if (!trader) throw new NotFoundException('Трейдер с таким ID не найден');
+    return trader;
   }
 }
