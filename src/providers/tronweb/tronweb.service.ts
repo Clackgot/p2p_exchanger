@@ -22,7 +22,7 @@ export class TronwebService {
         'TRON-PRO-API-KEY': applicationConstants.TRONGRID.TRONGRID_API_KEY,
       },
     });
-    const account = TronWeb.createAccount();
+    const account = tronWeb.createAccount();
     return account;
   }
   onModuleInit() {
