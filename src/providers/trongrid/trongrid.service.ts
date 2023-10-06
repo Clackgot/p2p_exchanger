@@ -1,41 +1,47 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, Logger } from '@nestjs/common';
-import { catchError, firstValueFrom } from 'rxjs';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  RequestTimeoutException,
+} from '@nestjs/common';
+import { NotFoundError, catchError, firstValueFrom } from 'rxjs';
 import applicationConstants from 'src/config/applicationConstants';
+import { RetryOnError } from 'src/decorators/retry-on-error.decorator';
 
-interface AddressInfo {
+export interface AddressInfo {
   address: string;
   usdtTetherBalance: number;
   trxBalance: number;
 }
+
 @Injectable()
 export class TrongridService {
   private logger: Logger = new Logger(this.constructor.name);
 
   constructor(private readonly httpService: HttpService) {}
 
+  @RetryOnError()
   async getAddressInfo(address: string): Promise<AddressInfo> {
     const { data } = await firstValueFrom(
-      this.httpService.get(`v1/accounts/${address}`).pipe(
-        catchError((error) => {
-          this.logger.error(error.response.data);
-          throw 'An error happened!';
-        }),
-      ),
+      this.httpService.get(`v1/accounts/${address}`),
     );
-    const trc20_tokens: any[] = data?.data[0]?.trc20 ?? [];
-    const usdtTetherBalance =
-      trc20_tokens.find((token) =>
-        token.hasOwnProperty(applicationConstants.TETHER_USDT_TOKEN_ADDRESS),
-      )?.[applicationConstants.TETHER_USDT_TOKEN_ADDRESS] / 1_000_000 ?? 0;
 
-    const trxBalance = data?.data[0]?.balance / 1_000_000;
+    if (!data?.data[0]) {
+      throw new NotFoundException(
+        `Аккаунт ${applicationConstants.TETHER_USDT_TOKEN_ADDRESS} не активирован`,
+      );
+    }
+    const trc20tokens: { [token: string]: string }[] =
+      data?.data[0]?.trc20 ?? [];
+    const keyToFind = applicationConstants.TETHER_USDT_TOKEN_ADDRESS;
+    const usdtToken = trc20tokens.find((obj) => obj[keyToFind]);
+    const usdtTetherBalance = usdtToken
+      ? parseInt(usdtToken[keyToFind]) / 1_000_000
+      : 0;
 
-    // TODO: Добавить проверку на NaN. Если аккаунт не активирован все балансы равны NaN
-    return {
-      address,
-      usdtTetherBalance,
-      trxBalance,
-    };
+    const trxBalance = parseInt(data?.data[0]?.balance) / 1_000_000 || 0;
+
+    return { address, usdtTetherBalance, trxBalance };
   }
 }

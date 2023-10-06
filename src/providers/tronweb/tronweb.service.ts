@@ -33,7 +33,4 @@ export class TronwebService {
 
     return account;
   }
-  onModuleInit() {
-    console.log(this.generateAddress());
-  }
 }

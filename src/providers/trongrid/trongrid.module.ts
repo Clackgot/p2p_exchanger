@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { TrongridService } from './trongrid.service';
 import { HttpModule } from '@nestjs/axios';
 import applicationConstants from 'src/config/applicationConstants';
@@ -18,11 +18,21 @@ import { errorMessages } from 'src/constants/errorMessages';
   providers: [TrongridService],
 })
 export class TrongridModule {
-  constructor(private readonly trongridService: TrongridService) {
-    trongridService
-      .getAddressInfo(applicationConstants.STORAGE.ADDRESS)
-      .then((data) => {
-        console.log(data);
-      });
+  private logger = new Logger(this.constructor.name);
+
+  constructor(private readonly trongridService: TrongridService) {}
+
+  async onModuleInit(): Promise<void> {
+    const addressInfo = await this.trongridService.getAddressInfo(
+      applicationConstants.STORAGE.ADDRESS,
+    );
+
+    this.logger.debug(
+      `${addressInfo.address} => USDT: ${addressInfo.usdtTetherBalance} | TRX: ${addressInfo.trxBalance}`,
+    );
+
+    if (addressInfo.usdtTetherBalance === 0) {
+      this.logger.warn(`Баланс USDT ${addressInfo.address} пуст`);
+    }
   }
 }
