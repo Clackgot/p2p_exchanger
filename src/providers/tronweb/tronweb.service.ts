@@ -4,13 +4,37 @@ import applicationConstants from 'src/config/applicationConstants';
 // @ts-ignore
 import * as TronWeb from 'tronweb';
 
+enum ContractRet {
+  REVERT = 'REVERT',
+  SUCCESS = 'SUCCESS',
+}
+
+class TronWebError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
+
+class TronWebBadwidthError extends TronWebError {
+  constructor(message: string) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
+
+class TronWebRevertError extends TronWebError {
+  constructor(message: string) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
+
 interface TronAccount {
   privateKey: string;
   publicKey: string;
-  address: {
-    base58: string;
-    hex: string;
-  };
+  address: string;
+  seedPhrase: string;
 }
 
 @Injectable()
@@ -23,24 +47,32 @@ export class TronwebService {
     privateKey: applicationConstants.STORAGE.PRIVATE_KEY,
   });
 
-  fromMnemonic(mnimonic: string): TronAccount {
-    const account = this.tronWeb.fromMnemonic(mnimonic);
-
-    return account;
+  async fromMnemonic(seedPhrase: string): Promise<TronAccount> {
+    const result = await this.tronWeb.fromMnemonic(seedPhrase);
+    const { address, privateKey, publicKey } = result;
+    return {
+      address,
+      privateKey,
+      publicKey,
+      seedPhrase,
+    };
   }
 
-  generateAddress(): TronAccount {
-    const account = this.tronWeb.createRandom();
-
-    return account;
+  async generateAddress(): Promise<TronAccount> {
+    const result = await this.tronWeb.createRandom();
+    const { address, privateKey, publicKey } = result;
+    const seedPhrase = result?.mnemonic?.phrase;
+    return {
+      address,
+      privateKey,
+      publicKey,
+      seedPhrase,
+    };
   }
 
   async onModuleInit() {
-    // await this.sendUSDTFromStorage('<ADDRESS>', 100)
-    //   .then((data) => console.log(data))
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+    const address = await this.generateAddress();
+    const addressFromMnemonic = await this.fromMnemonic(address.seedPhrase);
   }
 
   // TODO: Рефакторинг. Обработка ошибок
@@ -48,14 +80,26 @@ export class TronwebService {
     toAddress: string,
     amount: number,
   ): Promise<string> {
-    const recipientHex = this.tronWeb.address.toHex(toAddress);
-    const tokenAddress = applicationConstants.TETHER_USDT_TOKEN_ADDRESS;
-    const tx = await this.tronWeb.contract().at(tokenAddress);
-    const tx2 = await tx.transfer(recipientHex, amount * 1_000_000);
-    const tx3: string = await tx2.send();
+    try {
+      const recipientHex = this.tronWeb.address.toHex(toAddress);
+      const tokenAddress = applicationConstants.TETHER_USDT_TOKEN_ADDRESS;
+      const tx = await this.tronWeb.contract().at(tokenAddress);
+      const tx2 = await tx.transfer(recipientHex, amount * 1_000_000);
+      const tx3: string = await tx2.send();
+      console.log(tx3);
+      const transactionInfo = await this.tronWeb.trx.getTransaction(tx3);
+      console.log(transactionInfo);
 
-    const transactionInfo = await this.tronWeb.trx.getTransaction(tx3);
-    return transactionInfo;
+      // if (transactionInfo?.ret?.at(0)?.contractRet === 'REVERT') {
+      //   throw new TronWebRevertError('Недостаточно баланса для перевода');
+      // }
+      return transactionInfo;
+    } catch (err) {
+      if (err?.error === 'BANDWITH_ERROR') {
+        throw new TronWebBadwidthError(err?.message);
+      }
+      throw err;
+    }
   }
 
   // TODO: Рефакторинг. Обработка ошибок
