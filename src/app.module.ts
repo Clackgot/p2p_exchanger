@@ -7,6 +7,7 @@ import { MerchantsModule } from './merchants/merchants.module';
 import { TronscanModule } from './providers/tronscan/tronscan.module';
 import { TrongridModule } from './providers/trongrid/trongrid.module';
 import { TronwebModule } from './providers/tronweb/tronweb.module';
+import { TelegramBotModule } from './telegram-bot/telegram-bot.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TronwebModule } from './providers/tronweb/tronweb.module';
     TronscanModule,
     TrongridModule,
     TronwebModule,
+    TelegramBotModule,
   ],
   controllers: [AppController],
   providers: [AppService],

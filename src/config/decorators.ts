@@ -1,5 +1,6 @@
 import { Matches } from 'class-validator';
 import {
+  telegramBotTokenRegex,
   tronAddressRegex,
   trongridAuthKeyRegex,
   tronPrivateKeyRegex,
@@ -27,6 +28,15 @@ export function IsTronPrivateKey(): PropertyDecorator {
   return function (target: object, propertyKey: string | symbol): void {
     Matches(tronPrivateKeyRegex, {
       message: 'Неверный формат приватного ключа',
+      always: true,
+    })(target, propertyKey);
+  };
+}
+
+export function IsTelegramBotToken(): PropertyDecorator {
+  return function (target: object, propertyKey: string | symbol): void {
+    Matches(telegramBotTokenRegex, {
+      message: 'Неверный формат Telegram токена',
       always: true,
     })(target, propertyKey);
   };

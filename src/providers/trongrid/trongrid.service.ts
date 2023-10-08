@@ -23,9 +23,7 @@ export class TrongridService {
     );
 
     if (!data?.data[0]) {
-      throw new NotFoundException(
-        `Аккаунт ${applicationConstants.TETHER_USDT_TOKEN_ADDRESS} не активирован`,
-      );
+      return { address, trxBalance: 0, usdtTetherBalance: 0 };
     }
     const trc20tokens: { [token: string]: string }[] =
       data?.data[0]?.trc20 ?? [];

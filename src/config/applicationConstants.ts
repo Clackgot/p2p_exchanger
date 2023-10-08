@@ -1,7 +1,16 @@
 import { plainToInstance } from 'class-transformer';
-import { ValidateNested, validateSync, IsUrl, IsEnum } from 'class-validator';
+import {
+  ValidateNested,
+  validateSync,
+  IsUrl,
+  IsEnum,
+  IsString,
+  IsNumber,
+  IsPort,
+} from 'class-validator';
 import { config } from 'dotenv';
 import {
+  IsTelegramBotToken,
   IsTronAddress,
   IsTronPrivateKey,
   IsTrongridAuthKey,
@@ -12,6 +21,17 @@ import { TronNet } from 'src/enums/enums';
 config({ path: '.env' });
 
 const logger = new Logger('Constants');
+
+class TelegramBotConfig {
+  @IsTelegramBotToken()
+  TELEGRAM_BOT_TOKEN: string;
+
+  @IsString()
+  TELEGRAM_WEBHOOK_DOMAIN: string;
+
+  @IsPort()
+  TELEGRAM_WEBHOOK_PORT: number;
+}
 
 class TronAccount {
   @IsTronAddress()
@@ -54,6 +74,8 @@ class ApplicationConstants {
   TETHER_USDT_TOKEN_ADDRESS: string;
 
   STORAGE: TronAccount;
+
+  TELEGRAM: TelegramBotConfig;
 }
 
 let applicationConstants: ApplicationConstants = {
@@ -73,6 +95,14 @@ let applicationConstants: ApplicationConstants = {
   STORAGE: {
     ADDRESS: process.env.STORAGE_TRON_ADDRESS as string,
     PRIVATE_KEY: process.env.STORAGE_TRON_ADDRESS_PRIVATE_KEY as string,
+  },
+
+  TELEGRAM: {
+    TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN as string,
+    TELEGRAM_WEBHOOK_DOMAIN: process.env.TELEGRAM_WEBHOOK_DOMAIN as string,
+    TELEGRAM_WEBHOOK_PORT: parseInt(
+      process.env.TELEGRAM_WEBHOOK_PORT as string,
+    ),
   },
 };
 
