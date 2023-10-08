@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { MockMerchantsRepository } from './merchants.mock-repository';
+import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class MerchantsService {
@@ -12,6 +13,10 @@ export class MerchantsService {
   }
 
   async getMerchantById(id: number): Promise<Merchant> {
-    return this.mockMerchantsRepository.getMerchantById(id);
+    const merchant: Merchant | undefined =
+      await this.mockMerchantsRepository.getMerchantById(id);
+
+    if (!merchant) throw new NotFoundException('Мерчант с таким ID не найден');
+    return merchant;
   }
 }
