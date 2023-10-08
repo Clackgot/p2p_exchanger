@@ -1,12 +1,15 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import applicationConstants from 'src/config/applicationConstants';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import * as TronWeb from 'tronweb';
+import { TrongridService } from '../trongrid/trongrid.service';
 
-enum ContractRet {
+enum TronWebErrorCode {
   REVERT = 'REVERT',
   SUCCESS = 'SUCCESS',
+  BANDWITH_ERROR = 'BANDWITH_ERROR',
+  CONTRACT_VALIDATE_ERROR = 'CONTRACT_VALIDATE_ERROR',
 }
 
 class TronWebError extends Error {
@@ -23,7 +26,14 @@ class TronWebBadwidthError extends TronWebError {
   }
 }
 
-class TronWebRevertError extends TronWebError {
+class TronWebContractValidateError extends TronWebError {
+  constructor(message: string) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
+
+class TronWebInsufficientUSDTError extends TronWebError {
   constructor(message: string) {
     super(message);
     this.name = this.constructor.name;
@@ -39,6 +49,9 @@ interface TronAccount {
 
 @Injectable()
 export class TronwebService {
+  private logger = new Logger(this.constructor.name);
+  constructor(private readonly trongridService: TrongridService) {}
+
   private tronWeb = new TronWeb({
     fullHost: applicationConstants.TRONGRID.TRONGRID_API_URL,
     headers: {
@@ -71,49 +84,75 @@ export class TronwebService {
   }
 
   async onModuleInit() {
-    const address = await this.generateAddress();
-    const addressFromMnemonic = await this.fromMnemonic(address.seedPhrase);
-  }
-
-  // TODO: Рефакторинг. Обработка ошибок
-  async sendUSDTFromStorage(
-    toAddress: string,
-    amount: number,
-  ): Promise<string> {
     try {
-      const recipientHex = this.tronWeb.address.toHex(toAddress);
-      const tokenAddress = applicationConstants.TETHER_USDT_TOKEN_ADDRESS;
-      const tx = await this.tronWeb.contract().at(tokenAddress);
-      const tx2 = await tx.transfer(recipientHex, amount * 1_000_000);
-      const tx3: string = await tx2.send();
-      console.log(tx3);
-      const transactionInfo = await this.tronWeb.trx.getTransaction(tx3);
-      console.log(transactionInfo);
-
-      // if (transactionInfo?.ret?.at(0)?.contractRet === 'REVERT') {
-      //   throw new TronWebRevertError('Недостаточно баланса для перевода');
-      // }
-      return transactionInfo;
+      const result = await this.sendUSDTFromStorage('<ADDRESS>', 1);
+      console.log(result);
     } catch (err) {
-      if (err?.error === 'BANDWITH_ERROR') {
-        throw new TronWebBadwidthError(err?.message);
-      }
-      throw err;
+      this.logger.error(err.message);
     }
   }
 
-  // TODO: Рефакторинг. Обработка ошибок
-  async sendTRXFromStorage(toAddress: string, amount: number) {
-    const tradeobj = await this.tronWeb.transactionBuilder.sendTrx(
-      this.tronWeb.address.toHex(toAddress),
+  async sendUSDTFromStorage(
+    toAddress: string,
+    amount: number,
+  ): Promise<Boolean> {
+    const storageAddress = applicationConstants.STORAGE.ADDRESS;
+    const storageInfo = await this.trongridService.getAddressInfo(
+      storageAddress,
+    );
+
+    if (amount > storageInfo.usdtTetherBalance) {
+      const insufficiently: string = (
+        amount - storageInfo.usdtTetherBalance
+      ).toFixed(2);
+      throw new TronWebInsufficientUSDTError(
+        `Не хватает ${insufficiently} USDT для перевода`,
+      );
+    }
+
+    try {
+      const contract = await this.tronWeb
+        .contract()
+        .at(applicationConstants.TETHER_USDT_TOKEN_ADDRESS);
+      const signedTransaction = await contract.transfer(
+        toAddress,
+        amount * 1_000_000,
+      );
+
+      const transaction: Boolean = await signedTransaction.send({
+        shouldPollResponse: true,
+      });
+      return transaction;
+    } catch (err) {
+      switch (err?.error) {
+        case TronWebErrorCode.BANDWITH_ERROR:
+          throw new TronWebBadwidthError(err?.message);
+        default:
+          console.log(err);
+          throw new TronWebError('Неизвестная ошибка');
+      }
+    }
+  }
+
+  async sendTRXFromStorage(toAddress: string, amount: number): Promise<string> {
+    const transaction = await this.tronWeb.trx.sendTransaction(
+      toAddress,
       amount * 1_000_000,
-      this.tronWeb.address.toHex(applicationConstants.STORAGE.ADDRESS),
     );
-    const signedtxn = await this.tronWeb.trx.sign(
-      tradeobj,
-      applicationConstants.STORAGE.PRIVATE_KEY,
-    );
-    const transactionId = await this.tronWeb.trx.sendRawTransaction(signedtxn);
-    return transactionId;
+
+    if (transaction?.result && transaction?.txid) {
+      return transaction.txid;
+    }
+
+    switch (transaction?.code) {
+      case TronWebErrorCode.BANDWITH_ERROR:
+        throw new TronWebBadwidthError('Не хватает пропускной способности');
+      case TronWebErrorCode.CONTRACT_VALIDATE_ERROR:
+        throw new TronWebContractValidateError(
+          'Не удалось подтвердить транзакцию',
+        );
+      default:
+        throw new TronWebError('Неизвестная ошибка');
+    }
   }
 }

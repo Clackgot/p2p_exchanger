@@ -1,11 +1,6 @@
 import { HttpService } from '@nestjs/axios';
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-  RequestTimeoutException,
-} from '@nestjs/common';
-import { NotFoundError, catchError, firstValueFrom } from 'rxjs';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { firstValueFrom } from 'rxjs';
 import applicationConstants from 'src/config/applicationConstants';
 import { RetryOnError } from 'src/decorators/retry-on-error.decorator';
 

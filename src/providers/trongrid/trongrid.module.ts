@@ -16,6 +16,7 @@ import { errorMessages } from 'src/constants/errorMessages';
     }),
   ],
   providers: [TrongridService],
+  exports: [TrongridService],
 })
 export class TrongridModule {
   private logger = new Logger(this.constructor.name);

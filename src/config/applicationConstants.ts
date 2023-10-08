@@ -1,11 +1,5 @@
 import { plainToInstance } from 'class-transformer';
-import {
-  ValidateNested,
-  validateSync,
-  IsUrl,
-  IsEnum,
-  IsString,
-} from 'class-validator';
+import { ValidateNested, validateSync, IsUrl, IsEnum } from 'class-validator';
 import { config } from 'dotenv';
 import {
   IsTronAddress,
@@ -15,7 +9,7 @@ import {
 import { Logger } from '@nestjs/common';
 import { ApplicationEnviroment } from './enums';
 import { TronNet } from 'src/enums/enums';
-config();
+config({ path: '.env' });
 
 const logger = new Logger('Constants');
 
