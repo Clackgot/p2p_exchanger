@@ -84,12 +84,12 @@ export class TronwebService {
   }
 
   async onModuleInit() {
-    try {
-      const result = await this.sendUSDTFromStorage('<ADDRESS>', 1);
-      console.log(result);
-    } catch (err) {
-      this.logger.error(err.message);
-    }
+    // try {
+    //   const result = await this.sendUSDTFromStorage('<ADDRESS>', 1);
+    //   console.log(result);
+    // } catch (err) {
+    //   this.logger.error(err.message);
+    // }
   }
 
   async sendUSDTFromStorage(
