@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateMerchants } from './utils/generate-merchants';
+import { Merchant } from 'src/models/merchant.model';
 
 @Injectable()
 export class MockMerchantsRepository {

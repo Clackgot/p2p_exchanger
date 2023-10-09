@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { MockMerchantsRepository } from './merchants.mock-repository';
-import { NotFoundError } from 'rxjs';
+import { Merchant } from 'src/models/merchant.model';
 
 @Injectable()
 export class MerchantsService {

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { MockTradersRepository } from './traders.mock-repository';
+import { Trader } from 'src/models/trader.model';
 
 @Injectable()
 export class TradersService {

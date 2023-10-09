@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker/locale/ru';
+import { Merchant } from 'src/models/merchant.model';
 
 export function generateMerchants(options: {
   min: number;

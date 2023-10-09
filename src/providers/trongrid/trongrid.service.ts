@@ -1,14 +1,9 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import applicationConstants from 'src/config/applicationConstants';
 import { RetryOnError } from 'src/decorators/retry-on-error.decorator';
-
-export interface AddressInfo {
-  address: string;
-  usdtTetherBalance: number;
-  trxBalance: number;
-}
+import { AddressInfo } from 'src/models/address-info.model';
 
 @Injectable()
 export class TrongridService {
