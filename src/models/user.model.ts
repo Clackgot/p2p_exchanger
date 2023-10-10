@@ -23,22 +23,37 @@ export enum UserRole {
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-  @OneToOne(() => TelegramUser, { nullable: false })
+
+  @OneToOne(() => TelegramUser, {
+    nullable: false,
+    eager: true,
+    cascade: ['insert', 'update', 'soft-remove', 'recover'],
+  })
   @JoinColumn({ name: 'telegram_user' })
   telegramUser: TelegramUser;
 
-  @OneToOne(() => TronAccount, { nullable: false })
+  @OneToOne(() => TronAccount, {
+    nullable: false,
+    eager: true,
+    cascade: ['insert', 'update', 'soft-remove', 'recover'],
+  })
   @JoinColumn({ name: 'tron_account' })
   tronAccount: TronAccount;
 
-  @OneToOne(() => Balance, { nullable: false })
+  @OneToOne(() => Balance, {
+    nullable: false,
+    cascade: ['insert', 'update', 'soft-remove', 'recover'],
+  })
   @JoinColumn({ name: 'balance' })
   balance: Balance;
 
   @Column({ name: 'role', enum: UserRole, nullable: false })
   role: UserRole;
 
-  @OneToMany(() => BankCard, (card) => card.owner)
+  @OneToMany(() => BankCard, (card) => card.owner, {
+    eager: true,
+    cascade: ['insert', 'update', 'soft-remove', 'recover'],
+  })
   @JoinColumn({ name: 'bank_cards' })
   bankCards: BankCard[];
 }

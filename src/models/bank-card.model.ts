@@ -23,7 +23,7 @@ export class BankCard {
   @Column({ name: 'issuer', nullable: true })
   issuer?: string;
 
-  @ManyToOne(() => User, (user) => user.bankCards)
+  @ManyToOne(() => User, (user) => user.bankCards, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'owner' })
   owner: User;
 }

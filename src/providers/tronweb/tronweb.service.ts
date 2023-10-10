@@ -39,8 +39,11 @@ export class TronwebService {
 
   async generateAddress(): Promise<TronAddressDto> {
     const result = await this.tronWeb.createRandom();
-    const { address, privateKey, publicKey } = result;
-    const seedPhrase = result?.mnemonic?.phrase;
+    let { privateKey, publicKey } = result;
+    privateKey = privateKey?.replace('0x', '');
+    publicKey = publicKey?.replace('0x', '');
+    const address: string = result?.address;
+    const seedPhrase: string = result?.mnemonic?.phrase;
     return {
       address,
       privateKey,
@@ -48,8 +51,6 @@ export class TronwebService {
       seedPhrase,
     };
   }
-
-  async onModuleInit() {}
 
   async sendUSDTFromStorage(
     toAddress: string,
