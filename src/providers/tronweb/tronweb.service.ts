@@ -11,6 +11,8 @@ import { TronWebContractValidateError } from './errors/contract-validate.error';
 import { TronWebInsufficientUSDTError } from './errors/insufficient-usdt.error';
 import { TronAccount } from 'src/models/tron-account.model';
 
+type TronAddressDto = Omit<TronAccount, 'id'>;
+
 @Injectable()
 export class TronwebService {
   private logger = new Logger(this.constructor.name);
@@ -24,7 +26,7 @@ export class TronwebService {
     privateKey: applicationConstants.STORAGE.PRIVATE_KEY,
   });
 
-  async fromMnemonic(seedPhrase: string): Promise<TronAccount> {
+  async fromMnemonic(seedPhrase: string): Promise<TronAddressDto> {
     const result = await this.tronWeb.fromMnemonic(seedPhrase);
     const { address, privateKey, publicKey } = result;
     return {
@@ -35,7 +37,7 @@ export class TronwebService {
     };
   }
 
-  async generateAddress(): Promise<TronAccount> {
+  async generateAddress(): Promise<TronAddressDto> {
     const result = await this.tronWeb.createRandom();
     const { address, privateKey, publicKey } = result;
     const seedPhrase = result?.mnemonic?.phrase;
@@ -47,14 +49,7 @@ export class TronwebService {
     };
   }
 
-  async onModuleInit() {
-    // try {
-    //   const result = await this.sendUSDTFromStorage('<ADDRESS>', 1);
-    //   console.log(result);
-    // } catch (err) {
-    //   this.logger.error(err.message);
-    // }
-  }
+  async onModuleInit() {}
 
   async sendUSDTFromStorage(
     toAddress: string,
@@ -65,10 +60,8 @@ export class TronwebService {
       storageAddress,
     );
 
-    if (amount > storageInfo.usdtTetherBalance) {
-      const insufficiently: string = (
-        amount - storageInfo.usdtTetherBalance
-      ).toFixed(2);
+    if (amount > storageInfo.usdt) {
+      const insufficiently: string = (amount - storageInfo.usdt).toFixed(2);
       throw new TronWebInsufficientUSDTError(
         `Не хватает ${insufficiently} USDT для перевода`,
       );

@@ -7,6 +7,7 @@ import {
   IsString,
   IsNumber,
   IsPort,
+  IsBoolean,
 } from 'class-validator';
 import { config } from 'dotenv';
 import {
@@ -21,6 +22,26 @@ import { TronNet } from 'src/enums/enums';
 config({ path: '.env' });
 
 const logger = new Logger('Constants');
+
+class DatabaseConfig {
+  @IsString()
+  HOST: string;
+  @IsPort()
+  PORT: number;
+  @IsString()
+  USERNAME: string;
+  @IsString()
+  PASSWORD: string;
+  @IsString()
+  NAME: string;
+  @IsBoolean()
+  SYNCHRONIZE: boolean;
+}
+
+class ApplicationConfig {
+  @IsPort()
+  PORT: number;
+}
 
 class TelegramBotConfig {
   @IsTelegramBotToken()
@@ -76,6 +97,10 @@ class ApplicationConstants {
   STORAGE: TronAccount;
 
   TELEGRAM: TelegramBotConfig;
+
+  APP: ApplicationConfig;
+
+  DATABASE: DatabaseConfig;
 }
 
 let applicationConstants: ApplicationConstants = {
@@ -103,6 +128,18 @@ let applicationConstants: ApplicationConstants = {
     TELEGRAM_WEBHOOK_PORT: parseInt(
       process.env.TELEGRAM_WEBHOOK_PORT as string,
     ),
+  },
+  APP: {
+    PORT: parseInt(process.env.APP_PORT as string),
+  },
+
+  DATABASE: {
+    HOST: process.env['DB_HOST'] as string,
+    PORT: parseInt(process.env['DB_PORT'] as string),
+    USERNAME: process.env['DB_USERNAME'] as string,
+    PASSWORD: process.env['DB_PASSWORD'] as string,
+    NAME: process.env['DB_NAME'] as string,
+    SYNCHRONIZE: Boolean(process.env['DB_SYNCHRONIZE'] as string),
   },
 };
 

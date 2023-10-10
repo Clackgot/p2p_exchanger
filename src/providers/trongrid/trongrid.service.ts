@@ -3,7 +3,23 @@ import { Injectable, Logger } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import applicationConstants from 'src/config/applicationConstants';
 import { RetryOnError } from 'src/decorators/retry-on-error.decorator';
-import { AddressInfo } from 'src/models/address-info.model';
+import { Balance } from 'src/models/balance.model';
+import { TronAccount } from 'src/models/tron-account.model';
+
+// class AddressInfo implements Omit<Balance, 'id'>, Pick<TronAccount, 'address'> {
+//   address: string;
+//   tether: number;
+//   usdt: number;
+//   rub: number;
+// }
+
+class AddressInfo
+  implements Pick<TronAccount, 'address'>, Omit<Balance, 'rub' | 'id'>
+{
+  trx: number;
+  usdt: number;
+  address: string;
+}
 
 @Injectable()
 export class TrongridService {
@@ -18,18 +34,16 @@ export class TrongridService {
     );
 
     if (!data?.data[0]) {
-      return { address, trxBalance: 0, usdtTetherBalance: 0 };
+      return { address, trx: 0, usdt: 0 };
     }
     const trc20tokens: { [token: string]: string }[] =
       data?.data[0]?.trc20 ?? [];
     const keyToFind = applicationConstants.TETHER_USDT_TOKEN_ADDRESS;
     const usdtToken = trc20tokens.find((obj) => obj[keyToFind]);
-    const usdtTetherBalance = usdtToken
-      ? parseInt(usdtToken[keyToFind]) / 1_000_000
-      : 0;
+    const usdt = usdtToken ? parseInt(usdtToken[keyToFind]) / 1_000_000 : 0;
 
-    const trxBalance = parseInt(data?.data[0]?.balance) / 1_000_000 || 0;
+    const trx = parseInt(data?.data[0]?.balance) / 1_000_000 || 0;
 
-    return { address, usdtTetherBalance, trxBalance };
+    return { address, trx, usdt };
   }
 }
