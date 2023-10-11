@@ -29,7 +29,7 @@ services:
       - exchanger_db_volume:/var/lib/postgresql/data
 
   pgAdmin:
-    container_name: pgadmin4
+    container_name: exchanger_db_pgadmin4
     image: dpage/pgadmin4
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
