@@ -8,6 +8,7 @@ import { TronwebModule } from './providers/tronweb/tronweb.module';
 import { TelegramBotModule } from './telegram-bot/telegram-bot.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmModuleOptions } from './config/orm.config';
+import { DealsModule } from './deals/deals.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { typeOrmModuleOptions } from './config/orm.config';
     TronwebModule,
     TelegramBotModule,
     TypeOrmModule.forRoot(typeOrmModuleOptions),
+    DealsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
