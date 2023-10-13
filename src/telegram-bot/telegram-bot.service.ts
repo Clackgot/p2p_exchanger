@@ -24,9 +24,9 @@ export class TelegramBotService {
       // Выполняем логику для получения баланса по указанному адресу
       // В этом примере просто отправляем сообщение с адресом пользователя
       const addressInfo = await this.trongridService.getAddressInfo(address);
-      const message: string = `<b>Адрес:</b> ${address}\n<b>Баланс TRX:</b> ${addressInfo.trxBalance.toFixed(
+      const message = `<b>Адрес:</b> ${address}\n<b>Баланс TRX:</b> ${addressInfo.trx.toFixed(
         2,
-      )}\n<b>Баланс USDT:</b> ${addressInfo.usdtTetherBalance.toFixed(2)}`;
+      )}\n<b>Баланс USDT:</b> ${addressInfo.usdt.toFixed(2)}`;
       ctx.reply(message, { parse_mode: 'HTML' });
     });
 

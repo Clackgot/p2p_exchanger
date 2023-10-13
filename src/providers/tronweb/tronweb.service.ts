@@ -1,51 +1,17 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import applicationConstants from 'src/config/applicationConstants';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import * as TronWeb from 'tronweb';
 import { TrongridService } from '../trongrid/trongrid.service';
+import { TronWebErrorCode } from './enums/error-code.enum';
+import { TronWebBadwidthError } from './errors/badwidth.error';
+import { TronWebError } from './errors/base.error';
+import { TronWebContractValidateError } from './errors/contract-validate.error';
+import { TronWebInsufficientUSDTError } from './errors/insufficient-usdt.error';
+import { TronAccount } from 'src/models/tron-account.model';
 
-enum TronWebErrorCode {
-  REVERT = 'REVERT',
-  SUCCESS = 'SUCCESS',
-  BANDWITH_ERROR = 'BANDWITH_ERROR',
-  CONTRACT_VALIDATE_ERROR = 'CONTRACT_VALIDATE_ERROR',
-}
-
-class TronWebError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = this.constructor.name;
-  }
-}
-
-class TronWebBadwidthError extends TronWebError {
-  constructor(message: string) {
-    super(message);
-    this.name = this.constructor.name;
-  }
-}
-
-class TronWebContractValidateError extends TronWebError {
-  constructor(message: string) {
-    super(message);
-    this.name = this.constructor.name;
-  }
-}
-
-class TronWebInsufficientUSDTError extends TronWebError {
-  constructor(message: string) {
-    super(message);
-    this.name = this.constructor.name;
-  }
-}
-
-interface TronAccount {
-  privateKey: string;
-  publicKey: string;
-  address: string;
-  seedPhrase: string;
-}
+type TronAddressDto = Omit<TronAccount, 'id'>;
 
 @Injectable()
 export class TronwebService {
@@ -60,7 +26,7 @@ export class TronwebService {
     privateKey: applicationConstants.STORAGE.PRIVATE_KEY,
   });
 
-  async fromMnemonic(seedPhrase: string): Promise<TronAccount> {
+  async fromMnemonic(seedPhrase: string): Promise<TronAddressDto> {
     const result = await this.tronWeb.fromMnemonic(seedPhrase);
     const { address, privateKey, publicKey } = result;
     return {
@@ -71,10 +37,13 @@ export class TronwebService {
     };
   }
 
-  async generateAddress(): Promise<TronAccount> {
+  async generateAddress(): Promise<TronAddressDto> {
     const result = await this.tronWeb.createRandom();
-    const { address, privateKey, publicKey } = result;
-    const seedPhrase = result?.mnemonic?.phrase;
+    let { privateKey, publicKey } = result;
+    privateKey = privateKey?.replace('0x', '');
+    publicKey = publicKey?.replace('0x', '');
+    const address: string = result?.address;
+    const seedPhrase: string = result?.mnemonic?.phrase;
     return {
       address,
       privateKey,
@@ -83,28 +52,17 @@ export class TronwebService {
     };
   }
 
-  async onModuleInit() {
-    // try {
-    //   const result = await this.sendUSDTFromStorage('<ADDRESS>', 1);
-    //   console.log(result);
-    // } catch (err) {
-    //   this.logger.error(err.message);
-    // }
-  }
-
   async sendUSDTFromStorage(
     toAddress: string,
     amount: number,
-  ): Promise<Boolean> {
+  ): Promise<boolean> {
     const storageAddress = applicationConstants.STORAGE.ADDRESS;
     const storageInfo = await this.trongridService.getAddressInfo(
       storageAddress,
     );
 
-    if (amount > storageInfo.usdtTetherBalance) {
-      const insufficiently: string = (
-        amount - storageInfo.usdtTetherBalance
-      ).toFixed(2);
+    if (amount > storageInfo.usdt) {
+      const insufficiently: string = (amount - storageInfo.usdt).toFixed(2);
       throw new TronWebInsufficientUSDTError(
         `Не хватает ${insufficiently} USDT для перевода`,
       );
@@ -119,7 +77,7 @@ export class TronwebService {
         amount * 1_000_000,
       );
 
-      const transaction: Boolean = await signedTransaction.send({
+      const transaction: boolean = await signedTransaction.send({
         shouldPollResponse: true,
       });
       return transaction;

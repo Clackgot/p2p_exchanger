@@ -29,10 +29,10 @@ export class TrongridModule {
     );
 
     this.logger.debug(
-      `${addressInfo.address} => USDT: ${addressInfo.usdtTetherBalance} | TRX: ${addressInfo.trxBalance}`,
+      `${addressInfo.address} => USDT: ${addressInfo.usdt} | TRX: ${addressInfo.trx}`,
     );
 
-    if (addressInfo.usdtTetherBalance === 0) {
+    if (addressInfo.usdt === 0) {
       this.logger.warn(`Баланс USDT ${addressInfo.address} пуст`);
     }
   }

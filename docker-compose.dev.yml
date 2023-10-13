@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  api:
+    container_name: exchanger_app
+    user: root
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    restart: always
+    networks:
+      - exchanger_network
+    depends_on:
+      - db
+
+  db:
+    container_name: exchanger_db
+    image: postgres:14
+    environment:
+      - POSTGRES_HOST=${DB_HOST}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    expose:
+      - ${DB_PORT}
+    command: -p ${DB_PORT}
+    restart: unless-stopped
+    volumes:
+      - exchanger_db_volume:/var/lib/postgresql/data
+    networks:
+      - exchanger_network
+
+  pgAdmin:
+    container_name: exchanger_db_pgadmin4
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    ports:
+      - ${PGADMIN_EXTERNAL_PORT}:${PGADMIN_INTERNAL_PORT}
+    attach: false
+    networks:
+      - exchanger_network
+
+volumes:
+  exchanger_db_volume:
+    name: exchanger_db_volume
+
+networks:
+  exchanger_network:
+    name: exchanger_network

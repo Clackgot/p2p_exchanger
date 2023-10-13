@@ -1,22 +1,21 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { MockMerchantsRepository } from './merchants.mock-repository';
-import { NotFoundError } from 'rxjs';
+import { Injectable } from '@nestjs/common';
+import { User } from 'src/models/user.model';
+import { MerchantsRepository } from './merchants.repository';
+import { CreateMerchantDto } from './dto/create-merchant.dto';
 
 @Injectable()
 export class MerchantsService {
-  constructor(
-    private readonly mockMerchantsRepository: MockMerchantsRepository,
-  ) {}
+  constructor(private readonly merchantsRepository: MerchantsRepository) {}
 
-  async getMerchants(): Promise<Merchant[]> {
-    return this.mockMerchantsRepository.getMerchants();
+  async getMerchants(): Promise<User[]> {
+    return this.merchantsRepository.getMerchants();
   }
 
-  async getMerchantById(id: number): Promise<Merchant> {
-    const merchant: Merchant | undefined =
-      await this.mockMerchantsRepository.getMerchantById(id);
+  async getMerchantById(id: string): Promise<User> {
+    return this.merchantsRepository.getMerchantById(id);
+  }
 
-    if (!merchant) throw new NotFoundException('Мерчант с таким ID не найден');
-    return merchant;
+  async createMerchant(dto: CreateMerchantDto): Promise<User> {
+    return this.merchantsRepository.createMerchant(dto);
   }
 }

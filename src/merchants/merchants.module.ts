@@ -1,10 +1,14 @@
 import { Module } from '@nestjs/common';
 import { MerchantsService } from './merchants.service';
 import { MerchantsController } from './merchants.controller';
-import { MockMerchantsRepository } from './merchants.mock-repository';
+import { MerchantsRepository } from './merchants.repository';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from 'src/models/user.model';
+import { TronwebModule } from 'src/providers/tronweb/tronweb.module';
 
 @Module({
-  providers: [MerchantsService, MockMerchantsRepository],
+  imports: [TypeOrmModule.forFeature([User]), TronwebModule],
+  providers: [MerchantsService, MerchantsRepository],
   controllers: [MerchantsController],
 })
 export class MerchantsModule {}
