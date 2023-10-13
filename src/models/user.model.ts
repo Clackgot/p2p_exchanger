@@ -43,6 +43,7 @@ export class User {
   @OneToOne(() => Balance, {
     nullable: false,
     cascade: ['insert', 'update', 'soft-remove', 'recover'],
+    eager: true,
   })
   @JoinColumn({ name: 'balance' })
   balance: Balance;
