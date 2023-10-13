@@ -9,6 +9,7 @@ import { TelegramBotModule } from './telegram-bot/telegram-bot.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmModuleOptions } from './config/orm.config';
 import { DealsModule } from './deals/deals.module';
+import { ExchangerModule } from './exchanger/exchanger.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { DealsModule } from './deals/deals.module';
     TelegramBotModule,
     TypeOrmModule.forRoot(typeOrmModuleOptions),
     DealsModule,
+    ExchangerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
