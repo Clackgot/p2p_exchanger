@@ -5,6 +5,7 @@ import { EntityManager, Repository } from 'typeorm';
 import { CreateMerchantDto } from './dto/create-merchant.dto';
 import { TronAccount } from 'src/models/tron-account.model';
 import { TronwebService } from 'src/providers/tronweb/tronweb.service';
+import { Balance } from 'src/models/balance.model';
 
 @Injectable()
 export class MerchantsRepository {
@@ -36,7 +37,12 @@ export class MerchantsRepository {
           (await this.tronwebService.generateAddress()) as TronAccount;
 
         const user = new User();
-        user.balance = dto.balance;
+
+        user.balance = new Balance();
+        user.balance.rub = 0;
+        user.balance.usdt = 0;
+        user.balance.trx = 0;
+
         user.role = UserRole.merchant;
         user.telegramUser = dto.telegramUser;
         user.tronAccount = tronAccount;
