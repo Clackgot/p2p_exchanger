@@ -12,6 +12,7 @@ import { DealsModule } from './deals/deals.module';
 import { ExchangerModule } from './exchanger/exchanger.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { BalancesModule } from './balances/balances.module';
+import { CardsModule } from './cards/cards.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { BalancesModule } from './balances/balances.module';
     ExchangerModule,
     TransactionsModule,
     BalancesModule,
+    CardsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
