@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UsePipes } from '@nestjs/common';
 import { TradersService } from './traders.service';
 import { User } from 'src/models/user.model';
 import { CreateTraderDto } from './dto/create-trader.dto';
+import { RemoveCardDublicatesPipe } from './pipes/remove-card-dublicates.pipe';
 
 @Controller('traders')
 export class TradersController {
@@ -18,6 +19,7 @@ export class TradersController {
   }
 
   @Post()
+  @UsePipes(new RemoveCardDublicatesPipe())
   async createTrader(@Body() dto: CreateTraderDto): Promise<User> {
     return this.tradersService.createTrader(dto);
   }
