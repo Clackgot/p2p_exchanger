@@ -10,6 +10,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmModuleOptions } from './config/orm.config';
 import { DealsModule } from './deals/deals.module';
 import { ExchangerModule } from './exchanger/exchanger.module';
+import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ExchangerModule } from './exchanger/exchanger.module';
     TypeOrmModule.forRoot(typeOrmModuleOptions),
     DealsModule,
     ExchangerModule,
+    TransactionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

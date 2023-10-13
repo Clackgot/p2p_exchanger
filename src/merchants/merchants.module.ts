@@ -10,5 +10,6 @@ import { TronwebModule } from 'src/providers/tronweb/tronweb.module';
   imports: [TypeOrmModule.forFeature([User]), TronwebModule],
   providers: [MerchantsService, MerchantsRepository],
   controllers: [MerchantsController],
+  exports: [MerchantsService],
 })
 export class MerchantsModule {}
