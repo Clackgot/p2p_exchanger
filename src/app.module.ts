@@ -11,6 +11,7 @@ import { typeOrmModuleOptions } from './config/orm.config';
 import { DealsModule } from './deals/deals.module';
 import { ExchangerModule } from './exchanger/exchanger.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { BalancesModule } from './balances/balances.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { TransactionsModule } from './transactions/transactions.module';
     DealsModule,
     ExchangerModule,
     TransactionsModule,
+    BalancesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
