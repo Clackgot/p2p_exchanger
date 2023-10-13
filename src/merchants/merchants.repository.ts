@@ -37,7 +37,6 @@ export class MerchantsRepository {
 
         const user = new User();
         user.balance = dto.balance;
-        user.bankCards = dto.bankCards;
         user.role = UserRole.merchant;
         user.telegramUser = dto.telegramUser;
         user.tronAccount = tronAccount;

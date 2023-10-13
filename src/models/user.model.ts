@@ -53,6 +53,7 @@ export class User {
   @OneToMany(() => BankCard, (card) => card.owner, {
     eager: true,
     cascade: ['insert', 'update', 'soft-remove', 'recover'],
+    nullable: true,
   })
   @JoinColumn({ name: 'bank_cards' })
   bankCards: BankCard[];
