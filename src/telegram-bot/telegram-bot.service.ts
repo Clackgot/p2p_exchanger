@@ -9,7 +9,7 @@ import {
   Scene,
 } from 'grammy-scenes';
 import { UsersService } from 'src/users/users.service';
-import { User } from 'src/models/user.model';
+import { User, UserRole } from 'src/models/user.model';
 import { TelegramUser } from 'src/models/telegram-user.model';
 
 type SessionData = ScenesSessionData & {
@@ -27,8 +27,6 @@ export class TelegramBotService {
     this.init();
   }
 
-  private scenes = new ScenesComposer<BotContext>();
-
   private bot = new Bot(applicationConstants.TELEGRAM.TELEGRAM_BOT_TOKEN);
   async init() {
     this.bot.use(
@@ -37,6 +35,7 @@ export class TelegramBotService {
       }),
     );
     const mainScene = new Scene<BotContext>('main');
+
     mainScene.step(async (ctx) => {
       const identifier: number = ctx.from!.id!;
       const username: string = ctx.from!.username!;
@@ -51,82 +50,57 @@ export class TelegramBotService {
           telegramUser,
         });
       }
+      switch (user.role) {
+        case UserRole.admin:
+          ctx.scene.enter('admin');
+          break;
+        case UserRole.merchant:
+          ctx.scene.enter('merchant');
+          break;
+        case UserRole.trader:
+          ctx.scene.enter('trader');
+          break;
+        case UserRole.guest:
+          ctx.scene.enter('guest');
+          break;
+      }
       await ctx.reply(`Добро пожаловать, ${user?.telegramUser.username}`);
     });
-    mainScene.step(async (ctx) => {
-      await ctx.reply('Enter your name:');
+
+    const adminScene = new Scene<BotContext>('admin');
+    adminScene.label('admin');
+    adminScene.step(async (ctx) => {
+      await ctx.reply('admin');
     });
 
-    // As the flow comes to wait(), the execution will stop.
-    // Next Telegram updates will be passed to the inner middleware.
-    // The inner middleware should call ctx.scene.resume() to proceed to the next scene step.
-    // Make sure to use unique label in each wait() block.
-    mainScene.wait('name').on('message:text', async (ctx) => {
-      const name = ctx.message.text;
-      if (name.toLowerCase() === 'john') {
-        await ctx.reply(`Welcome, ${name}!`);
-        // Proceed to the next step.
-        ctx.scene.resume();
-      } else {
-        await ctx.reply(`${name}, your are not welcome here.`);
-        // Keep the execution in the current wait() block.
-      }
+    const merchantScene = new Scene<BotContext>('merchant');
+    merchantScene.step(async (ctx) => {
+      await ctx.reply('merchant');
+    });
+    const traderScene = new Scene<BotContext>('trader');
+    traderScene.step(async (ctx) => {
+      await ctx.reply('trader');
+    });
+    const guestScene = new Scene<BotContext>('guest');
+    guestScene.step(async (ctx) => {
+      await ctx.reply('guest');
     });
 
-    // Add more steps...
-    mainScene.step(async (ctx) => {
-      await ctx.reply('Proceeding...');
-    });
-
-    // Mark position in the scene to be able to jump to it (see below).
-    mainScene.label('start');
-
-    // A scene may unconditionally call a nested scene.
-    // See sample captcha implementation below.
-    mainScene.call('captcha');
-
-    // Please add step label for the first step after call()
-    mainScene.label('after_captcha').step(async (ctx) => {
-      await ctx.reply(`Please choose:`, {
-        reply_markup: {
-          inline_keyboard: [
-            [
-              { text: 'Start over', callback_data: 'start' },
-              { text: 'Add item', callback_data: 'add_item' },
-              { text: 'Exit', callback_data: 'exit' },
-            ],
-          ],
-        },
-      });
-    });
-
-    mainScene.wait('menu').on('callback_query:data', async (ctx) => {
-      await ctx.answerCallbackQuery();
-      const choice = ctx.callbackQuery.data;
-      if (choice === 'start') {
-        // Jump to the label marked above.
-        ctx.scene.goto('start');
-      } else if (choice === 'add_item') {
-        // Conditionally call a nested scene.
-        // Implies automatic resume after the nested scene completes.
-        ctx.scene.call('add_item');
-      } else if (choice === 'exit') {
-        // Exit scene, don't call next middleware.
-        ctx.scene.exit();
-      }
-    });
-
-    mainScene.step((ctx) => ctx.reply(`Main scene finished`));
-
-    this.scenes.scene(mainScene);
-    this.bot.use(this.scenes.manager());
+    const scenes = new ScenesComposer<BotContext>(
+      mainScene,
+      adminScene,
+      merchantScene,
+      traderScene,
+      guestScene,
+    );
+    this.bot.use(scenes.manager());
+    // this.bot.use(scenes);
 
     // this.bot.on('message:text', (ctx) =>
     //   ctx.reply(`Echo: ${ctx.message.text}`),
     // );
 
     this.bot.command('start', async (ctx: any) => {
-      await ctx.reply(`Welcome here.`);
       await ctx.scenes.enter('main');
     });
 
