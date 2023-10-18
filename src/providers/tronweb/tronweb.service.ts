@@ -86,7 +86,7 @@ export class TronwebService {
         case TronWebErrorCode.BANDWITH_ERROR:
           throw new TronWebBadwidthError(err?.message);
         default:
-          console.log(err);
+          this.logger.error(err);
           throw new TronWebError('Неизвестная ошибка');
       }
     }

@@ -8,6 +8,9 @@ import {
   ScenesComposer,
   Scene,
 } from 'grammy-scenes';
+import { UsersService } from 'src/users/users.service';
+import { User } from 'src/models/user.model';
+import { TelegramUser } from 'src/models/telegram-user.model';
 
 type SessionData = ScenesSessionData & {
   // Your own global session interface, could be empty as well.
@@ -17,10 +20,11 @@ export type BotContext = Context & SessionFlavor<SessionData> & ScenesFlavor;
 
 @Injectable()
 export class TelegramBotService {
-  constructor(private readonly trongridService: TrongridService) {
-    this.init()
-      .then((data) => console.log(data))
-      .catch((error) => console.error(error));
+  constructor(
+    private readonly trongridService: TrongridService,
+    private readonly usersService: UsersService,
+  ) {
+    this.init();
   }
 
   private scenes = new ScenesComposer<BotContext>();
@@ -34,9 +38,21 @@ export class TelegramBotService {
     );
     const mainScene = new Scene<BotContext>('main');
     mainScene.step(async (ctx) => {
-      await ctx.reply('Entering main scene...');
+      const identifier: number = ctx.from!.id!;
+      const username: string = ctx.from!.username!;
+      let user: User | null = await this.usersService.getUserByTelegramId(
+        identifier,
+      );
+      const telegramUser = new TelegramUser();
+      telegramUser.identifier = identifier;
+      telegramUser.username = username;
+      if (!user) {
+        user = await this.usersService.createUser({
+          telegramUser,
+        });
+      }
+      await ctx.reply(`Добро пожаловать, ${user?.telegramUser.username}`);
     });
-
     mainScene.step(async (ctx) => {
       await ctx.reply('Enter your name:');
     });
