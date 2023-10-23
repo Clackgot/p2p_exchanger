@@ -1,22 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import applicationConstants from 'src/config/applicationConstants';
 import { TrongridService } from 'src/providers/trongrid/trongrid.service';
-import { Bot, Context, SessionFlavor, session } from 'grammy';
-import {
-  ScenesSessionData,
-  ScenesFlavor,
-  ScenesComposer,
-  Scene,
-} from 'grammy-scenes';
+import { Bot, session } from 'grammy';
+import { ScenesComposer, Scene } from 'grammy-scenes';
+
 import { UsersService } from 'src/users/users.service';
 import { User, UserRole } from 'src/models/user.model';
 import { TelegramUser } from 'src/models/telegram-user.model';
-
-type SessionData = ScenesSessionData & {
-  // Your own global session interface, could be empty as well.
-};
-
-export type BotContext = Context & SessionFlavor<SessionData> & ScenesFlavor;
+import { BotScenes } from './constants';
+import { BotContext } from './types';
 
 @Injectable()
 export class TelegramBotService {
@@ -28,14 +20,66 @@ export class TelegramBotService {
   }
 
   private bot = new Bot(applicationConstants.TELEGRAM.TELEGRAM_BOT_TOKEN);
-  async init() {
-    this.bot.use(
-      session({
-        initial: () => ({}),
-      }),
-    );
-    const mainScene = new Scene<BotContext>('main');
 
+  adminMainScene(): Scene<BotContext, undefined> {
+    const adminScene = new Scene<BotContext>(BotScenes.admin);
+    adminScene.label(BotScenes.admin);
+    adminScene.step(async (ctx) => {
+      const identifier: number = ctx.from!.id!;
+      const user: User | null = await this.usersService.getUserByTelegramId(
+        identifier,
+      );
+      await ctx.reply(
+        `[admin] Добро пожаловать, ${user?.telegramUser.username}`,
+      );
+    });
+    return adminScene;
+  }
+
+  merchantMainScene(): Scene<BotContext, undefined> {
+    const merchantScene = new Scene<BotContext>(BotScenes.merchant);
+    merchantScene.step(async (ctx) => {
+      const identifier: number = ctx.from!.id!;
+      const user: User | null = await this.usersService.getUserByTelegramId(
+        identifier,
+      );
+      await ctx.reply(
+        `[merchant] Добро пожаловать, ${user?.telegramUser.username}`,
+      );
+    });
+    return merchantScene;
+  }
+
+  traderMainScene(): Scene<BotContext, undefined> {
+    const traderScene = new Scene<BotContext>(BotScenes.trader);
+    traderScene.step(async (ctx) => {
+      const identifier: number = ctx.from!.id!;
+      const user: User | null = await this.usersService.getUserByTelegramId(
+        identifier,
+      );
+      await ctx.reply(
+        `[trader] Добро пожаловать, ${user?.telegramUser.username}`,
+      );
+    });
+    return traderScene;
+  }
+
+  guestMainScene(): Scene<BotContext, undefined> {
+    const guestScene = new Scene<BotContext>(BotScenes.guest);
+    guestScene.step(async (ctx) => {
+      const identifier: number = ctx.from!.id!;
+      const user: User | null = await this.usersService.getUserByTelegramId(
+        identifier,
+      );
+      await ctx.reply(
+        `[guest] Добро пожаловать, ${user?.telegramUser.username}`,
+      );
+    });
+    return guestScene;
+  }
+
+  mainScene(): Scene<BotContext, undefined> {
+    const mainScene = new Scene<BotContext>(BotScenes.main);
     mainScene.step(async (ctx) => {
       const identifier: number = ctx.from!.id!;
       const username: string = ctx.from!.username!;
@@ -52,46 +96,35 @@ export class TelegramBotService {
       }
       switch (user.role) {
         case UserRole.admin:
-          ctx.scene.enter('admin');
+          ctx.scene.enter(BotScenes.admin);
           break;
         case UserRole.merchant:
-          ctx.scene.enter('merchant');
+          ctx.scene.enter(BotScenes.merchant);
           break;
         case UserRole.trader:
-          ctx.scene.enter('trader');
+          ctx.scene.enter(BotScenes.trader);
           break;
         case UserRole.guest:
-          ctx.scene.enter('guest');
+          ctx.scene.enter(BotScenes.guest);
           break;
       }
-      await ctx.reply(`Добро пожаловать, ${user?.telegramUser.username}`);
     });
+    return mainScene;
+  }
 
-    const adminScene = new Scene<BotContext>('admin');
-    adminScene.label('admin');
-    adminScene.step(async (ctx) => {
-      await ctx.reply('admin');
-    });
-
-    const merchantScene = new Scene<BotContext>('merchant');
-    merchantScene.step(async (ctx) => {
-      await ctx.reply('merchant');
-    });
-    const traderScene = new Scene<BotContext>('trader');
-    traderScene.step(async (ctx) => {
-      await ctx.reply('trader');
-    });
-    const guestScene = new Scene<BotContext>('guest');
-    guestScene.step(async (ctx) => {
-      await ctx.reply('guest');
-    });
+  async init() {
+    this.bot.use(
+      session({
+        initial: () => ({}),
+      }),
+    );
 
     const scenes = new ScenesComposer<BotContext>(
-      mainScene,
-      adminScene,
-      merchantScene,
-      traderScene,
-      guestScene,
+      this.mainScene(),
+      this.adminMainScene(),
+      this.merchantMainScene(),
+      this.traderMainScene(),
+      this.guestMainScene(),
     );
     this.bot.use(scenes.manager());
     // this.bot.use(scenes);
@@ -101,7 +134,7 @@ export class TelegramBotService {
     // );
 
     this.bot.command('start', async (ctx: any) => {
-      await ctx.scenes.enter('main');
+      await ctx.scenes.enter(BotScenes.main);
     });
 
     this.bot.start();
