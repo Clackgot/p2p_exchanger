@@ -10,5 +10,6 @@ import { TradersRepository } from './traders.repository';
   imports: [TronwebModule, TypeOrmModule.forFeature([User])],
   providers: [TradersService, TradersRepository],
   controllers: [TradersController],
+  exports: [TradersService],
 })
 export class TradersModule {}

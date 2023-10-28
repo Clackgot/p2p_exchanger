@@ -15,6 +15,7 @@ export enum UserRole {
   admin = 'admin',
   trader = 'trader',
   merchant = 'merchant',
+  guest = 'guest',
 }
 
 @Entity({
@@ -43,11 +44,17 @@ export class User {
   @OneToOne(() => Balance, {
     nullable: false,
     cascade: ['insert', 'update', 'soft-remove', 'recover'],
+    eager: true,
   })
   @JoinColumn({ name: 'balance' })
   balance: Balance;
 
-  @Column({ name: 'role', enum: UserRole, nullable: false })
+  @Column({
+    name: 'role',
+    enum: UserRole,
+    nullable: false,
+    default: UserRole.guest,
+  })
   role: UserRole;
 
   @OneToMany(() => BankCard, (card) => card.owner, {

@@ -1,43 +1,142 @@
 import { Injectable } from '@nestjs/common';
 import applicationConstants from 'src/config/applicationConstants';
-import { Telegraf } from 'telegraf';
-import * as crypto from 'node:crypto';
 import { TrongridService } from 'src/providers/trongrid/trongrid.service';
+import { Bot, session } from 'grammy';
+import { ScenesComposer, Scene } from 'grammy-scenes';
+
+import { UsersService } from 'src/users/users.service';
+import { User, UserRole } from 'src/models/user.model';
+import { TelegramUser } from 'src/models/telegram-user.model';
+import { BotScenes } from './constants';
+import { BotContext } from './types';
 
 @Injectable()
 export class TelegramBotService {
-  constructor(private readonly trongridService: TrongridService) {}
-
-  private bot = new Telegraf(applicationConstants.TELEGRAM.TELEGRAM_BOT_TOKEN);
-  async onModuleInit() {
-    const result = await this.init();
+  constructor(
+    private readonly trongridService: TrongridService,
+    private readonly usersService: UsersService,
+  ) {
+    this.init();
   }
+
+  private bot = new Bot(applicationConstants.TELEGRAM.TELEGRAM_BOT_TOKEN);
+
+  adminMainScene(): Scene<BotContext, undefined> {
+    const adminScene = new Scene<BotContext>(BotScenes.admin);
+    adminScene.label(BotScenes.admin);
+    adminScene.step(async (ctx) => {
+      const identifier: number = ctx.from!.id!;
+      const user: User | null = await this.usersService.getUserByTelegramId(
+        identifier,
+      );
+      await ctx.reply(
+        `[admin] Добро пожаловать, ${user?.telegramUser.username}`,
+      );
+    });
+    return adminScene;
+  }
+
+  merchantMainScene(): Scene<BotContext, undefined> {
+    const merchantScene = new Scene<BotContext>(BotScenes.merchant);
+    merchantScene.step(async (ctx) => {
+      const identifier: number = ctx.from!.id!;
+      const user: User | null = await this.usersService.getUserByTelegramId(
+        identifier,
+      );
+      await ctx.reply(
+        `[merchant] Добро пожаловать, ${user?.telegramUser.username}`,
+      );
+    });
+    return merchantScene;
+  }
+
+  traderMainScene(): Scene<BotContext, undefined> {
+    const traderScene = new Scene<BotContext>(BotScenes.trader);
+    traderScene.step(async (ctx) => {
+      const identifier: number = ctx.from!.id!;
+      const user: User | null = await this.usersService.getUserByTelegramId(
+        identifier,
+      );
+      await ctx.reply(
+        `[trader] Добро пожаловать, ${user?.telegramUser.username}`,
+      );
+    });
+    return traderScene;
+  }
+
+  guestMainScene(): Scene<BotContext, undefined> {
+    const guestScene = new Scene<BotContext>(BotScenes.guest);
+    guestScene.step(async (ctx) => {
+      const identifier: number = ctx.from!.id!;
+      const user: User | null = await this.usersService.getUserByTelegramId(
+        identifier,
+      );
+      await ctx.reply(
+        `[guest] Добро пожаловать, ${user?.telegramUser.username}`,
+      );
+    });
+    return guestScene;
+  }
+
+  mainScene(): Scene<BotContext, undefined> {
+    const mainScene = new Scene<BotContext>(BotScenes.main);
+    mainScene.step(async (ctx) => {
+      const identifier: number = ctx.from!.id!;
+      const username: string = ctx.from!.username!;
+      let user: User | null = await this.usersService.getUserByTelegramId(
+        identifier,
+      );
+      const telegramUser = new TelegramUser();
+      telegramUser.identifier = identifier;
+      telegramUser.username = username;
+      if (!user) {
+        user = await this.usersService.createUser({
+          telegramUser,
+        });
+      }
+      switch (user.role) {
+        case UserRole.admin:
+          ctx.scene.enter(BotScenes.admin);
+          break;
+        case UserRole.merchant:
+          ctx.scene.enter(BotScenes.merchant);
+          break;
+        case UserRole.trader:
+          ctx.scene.enter(BotScenes.trader);
+          break;
+        case UserRole.guest:
+          ctx.scene.enter(BotScenes.guest);
+          break;
+      }
+    });
+    return mainScene;
+  }
+
   async init() {
-    this.bot.start((ctx) =>
-      ctx.reply('Доступные команды: /getBalance <АДРЕС>'),
+    this.bot.use(
+      session({
+        initial: () => ({}),
+      }),
     );
 
-    this.bot.command('getBalance', async (ctx) => {
-      // Извлекаем аргумент <АДРЕС> из текста команды
-      const address = ctx.message.text.split(' ')[1];
-      if (!address) ctx.reply('Введите TRON адрес');
-      // Выполняем логику для получения баланса по указанному адресу
-      // В этом примере просто отправляем сообщение с адресом пользователя
-      const addressInfo = await this.trongridService.getAddressInfo(address);
-      const message = `<b>Адрес:</b> ${address}\n<b>Баланс TRX:</b> ${addressInfo.trx.toFixed(
-        2,
-      )}\n<b>Баланс USDT:</b> ${addressInfo.usdt.toFixed(2)}`;
-      ctx.reply(message, { parse_mode: 'HTML' });
+    const scenes = new ScenesComposer<BotContext>(
+      this.mainScene(),
+      this.adminMainScene(),
+      this.merchantMainScene(),
+      this.traderMainScene(),
+      this.guestMainScene(),
+    );
+    this.bot.use(scenes.manager());
+    // this.bot.use(scenes);
+
+    // this.bot.on('message:text', (ctx) =>
+    //   ctx.reply(`Echo: ${ctx.message.text}`),
+    // );
+
+    this.bot.command('start', async (ctx: any) => {
+      await ctx.scenes.enter(BotScenes.main);
     });
 
-    const secretToken = crypto.randomBytes(64).toString('hex');
-    this.bot.launch({
-      webhook: {
-        domain: applicationConstants.TELEGRAM.TELEGRAM_WEBHOOK_DOMAIN,
-        port: applicationConstants.TELEGRAM.TELEGRAM_WEBHOOK_PORT,
-        secretToken,
-      },
-    });
-    return 'Hello';
+    this.bot.start();
   }
 }
