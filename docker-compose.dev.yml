@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   api:
-    container_name: exchanger_app
+    container_name: exchanger_app_dev
     user: root
     build:
       context: .
@@ -14,12 +14,14 @@ services:
       - ${APP_PORT}:${APP_PORT}
     restart: always
     networks:
-      - exchanger_network
+      - exchanger_network_dev
     depends_on:
       - db
+    env_file:
+      - .env.dev
 
   db:
-    container_name: exchanger_db
+    container_name: exchanger_db_dev
     image: postgres:14
     environment:
       - POSTGRES_HOST=${DB_HOST}
@@ -31,12 +33,14 @@ services:
     command: -p ${DB_PORT}
     restart: unless-stopped
     volumes:
-      - exchanger_db_volume:/var/lib/postgresql/data
+      - exchanger_db_volume_dev:/var/lib/postgresql/data
     networks:
-      - exchanger_network
+      - exchanger_network_dev
+    env_file:
+      - .env.dev
 
   pgAdmin:
-    container_name: exchanger_db_pgadmin4
+    container_name: exchanger_db_pgadmin4_dev
     image: dpage/pgadmin4
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
@@ -45,12 +49,14 @@ services:
       - ${PGADMIN_EXTERNAL_PORT}:${PGADMIN_INTERNAL_PORT}
     attach: false
     networks:
-      - exchanger_network
+      - exchanger_network_dev
+    env_file:
+      - .env.dev
 
 volumes:
-  exchanger_db_volume:
-    name: exchanger_db_volume
+  exchanger_db_volume_dev:
+    name: exchanger_db_volume_dev
 
 networks:
-  exchanger_network:
-    name: exchanger_network
+  exchanger_network_dev:
+    name: exchanger_network_dev
