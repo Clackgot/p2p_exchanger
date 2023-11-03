@@ -14,7 +14,7 @@ export class UsersService {
   async createUser(dto: CreateUserDto): Promise<User> {
     return this.usersRepository.createUser(dto);
   }
-  async getUserByTelegramId(identifier: number): Promise<User | null> {
-    return this.usersRepository.getUserByTelegramId(identifier);
+  async getUserByTelegramId(id: number): Promise<User | null> {
+    return this.usersRepository.getUserByTelegramId(id);
   }
 }
