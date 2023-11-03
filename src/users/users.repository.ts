@@ -19,11 +19,11 @@ export class UsersRepository {
     return this.usersRepository.find();
   }
 
-  async getUserByTelegramId(identifier: number): Promise<User | null> {
+  async getUserByTelegramId(id: number): Promise<User | null> {
     return this.usersRepository.findOne({
       where: {
         telegramUser: {
-          identifier,
+          id,
         },
       },
     });
@@ -31,8 +31,8 @@ export class UsersRepository {
 
   async createUser(dto: CreateUserDto): Promise<User> {
     const manager = this.usersRepository.manager;
-    const identifier = dto.telegramUser.identifier;
-    const exsistUser = await this.getUserByTelegramId(identifier);
+    const { id } = dto.telegramUser;
+    const exsistUser = await this.getUserByTelegramId(id);
 
     if (exsistUser) {
       throw new ConflictException('Пользователь уже существует');

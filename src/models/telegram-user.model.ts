@@ -1,15 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({
   name: 'telegram_users',
 })
 export class TelegramUser {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryColumn({ type: 'bigint' })
+  id: number;
 
-  @Column({ name: 'identifier', nullable: false })
-  identifier: number;
-
-  @Column({ name: 'username', nullable: false })
-  username: string;
+  @Column({ name: 'username', nullable: true })
+  username?: string;
 }
