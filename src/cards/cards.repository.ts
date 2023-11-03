@@ -4,6 +4,7 @@ import { BankCard } from 'src/models/bank-card.model';
 import { User } from 'src/models/user.model';
 import { Repository } from 'typeorm';
 import { GetCardsByUserIdDto } from './dto/get-cards-by-user-id.dto';
+import { CreateCardDto } from './dto/create-card.dto';
 
 @Injectable()
 export class CardsRepository {
@@ -23,5 +24,9 @@ export class CardsRepository {
 
   async getAllCards(): Promise<BankCard[]> {
     return this.bankCardsRepository.find();
+  }
+
+  async createCard(dto: CreateCardDto): Promise<BankCard> {
+    return this.bankCardsRepository.save(dto);
   }
 }

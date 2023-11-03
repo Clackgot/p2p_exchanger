@@ -11,11 +11,13 @@ import { MerchantScene } from './scenes/merchant/merchant.scene';
 import { TraderScene } from './scenes/trader/trader.scene';
 import { GuestScene } from './scenes/guest/guest.scene';
 import { TraderCardsScene } from './scenes/trader/cards.scene';
+import { CardsModule } from 'src/cards/cards.module';
 
 @Module({
   imports: [
     TrongridModule,
     UsersModule,
+    CardsModule,
     TelegrafModule.forRoot({
       token: applicationConstants.TELEGRAM.TELEGRAM_BOT_TOKEN,
       middlewares: [session()],

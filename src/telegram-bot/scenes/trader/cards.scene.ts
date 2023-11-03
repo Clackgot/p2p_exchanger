@@ -5,11 +5,11 @@ import { Scenes } from 'telegraf';
 import { BotScenes } from '../../constants';
 import { SceneContext } from 'telegraf/typings/scenes';
 import {
-  InlineKeyboardMarkup,
   KeyboardButton,
   ReplyKeyboardMarkup,
   Update,
 } from 'telegraf/typings/core/types/typegram';
+import { CardsService } from 'src/cards/cards.service';
 
 enum TraderCardsCommands {
   getCards = 'Список карт',
@@ -22,7 +22,7 @@ enum TraderCardsCommands {
 @Scene(BotScenes.traderCards)
 export class TraderCardsScene {
   constructor(
-    private readonly trongridService: TrongridService,
+    private readonly cardsService: CardsService,
     private readonly usersService: UsersService,
   ) {}
 
@@ -65,6 +65,12 @@ export class TraderCardsScene {
   async addCard(
     @Context() ctx: SceneContext & { update: Update.CallbackQueryUpdate },
   ) {
+    if (!ctx.message?.from) return 'Не удалось найти пользователя';
+
+    const { id } = ctx.message?.from;
+    const user = await this.usersService.getUserByTelegramId(id);
+    // TODO: Добавить создание карты
+    //this.cardsService.createCard();
     await ctx.reply('Добавление карты');
   }
 
