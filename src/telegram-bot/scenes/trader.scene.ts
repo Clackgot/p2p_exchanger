@@ -12,13 +12,17 @@ export class TraderScene {
   ) {}
 
   @SceneEnter()
-  async step1(@Context() ctx: Scenes.SceneContext) {
-    if (!ctx.message?.from) return ctx.reply('Не удалось найти пользователя');
+  async sayHello(@Context() ctx: Scenes.SceneContext) {
+    if (!ctx.message?.from) return 'Не удалось найти пользователя';
 
     const { id } = ctx.message?.from;
     const user = await this.usersService.getUserByTelegramId(id);
-    ctx.reply(
-      `[${user?.role}] Добро пожаловать!, ${user?.telegramUser.username}`,
-    );
+    if (user?.telegramUser?.username) {
+      await ctx.reply(
+        `[${user?.role}] Добро пожаловать, ${user?.telegramUser.username}`,
+      );
+    } else {
+      await ctx.reply(`[${user?.role}] Добро пожаловать!`);
+    }
   }
 }

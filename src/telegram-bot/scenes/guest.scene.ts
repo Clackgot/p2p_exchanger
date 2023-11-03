@@ -13,12 +13,13 @@ export class GuestScene {
 
   @SceneEnter()
   async step1(@Context() ctx: Scenes.SceneContext) {
-    if (!ctx.message?.from) return ctx.reply('Не удалось найти пользователя');
-
+    if (!ctx.message?.from) return 'Не удалось найти пользователя';
     const { id } = ctx.message?.from;
     const user = await this.usersService.getUserByTelegramId(id);
-    ctx.reply(
-      `[${user?.role}] Добро пожаловать!, ${user?.telegramUser.username}`,
-    );
+    if (user?.telegramUser?.username) {
+      return `[${user?.role}] Добро пожаловать, ${user?.telegramUser.username}`;
+    } else {
+      return `[${user?.role}] Добро пожаловать!`;
+    }
   }
 }
