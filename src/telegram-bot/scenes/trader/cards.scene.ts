@@ -54,7 +54,11 @@ export class TraderCardsScene {
   async getCards(
     @Context() ctx: SceneContext & { update: Update.CallbackQueryUpdate },
   ) {
-    await ctx.reply('Список карт');
+    if (!ctx.message?.from) return 'Не удалось найти пользователя';
+
+    const { id } = ctx.message?.from;
+    const user = await this.usersService.getUserByTelegramId(id);
+    await ctx.reply(`У вас ${user?.bankCards?.length || 0} карт`);
   }
 
   @Hears(TraderCardsCommands.addCard)
