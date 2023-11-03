@@ -3,5 +3,5 @@ export enum BotScenes {
   merchant = 'merchant',
   trader = 'trader',
   guest = 'guest',
-  main = 'main',
+  traderCards = 'traderCards',
 }

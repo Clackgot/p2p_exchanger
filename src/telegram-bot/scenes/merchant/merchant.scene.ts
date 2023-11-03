@@ -2,7 +2,7 @@ import { Context, Scene, SceneEnter, Hears } from 'nestjs-telegraf';
 import { TrongridService } from 'src/providers/trongrid/trongrid.service';
 import { UsersService } from 'src/users/users.service';
 import { Scenes } from 'telegraf';
-import { BotScenes } from '../constants';
+import { BotScenes } from '../../constants';
 import { SceneContext } from 'telegraf/typings/scenes';
 import { Update } from 'telegraf/typings/core/types/typegram';
 
