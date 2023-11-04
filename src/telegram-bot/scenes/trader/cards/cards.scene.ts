@@ -1,4 +1,4 @@
-import { Context, Scene, SceneEnter, Hears } from 'nestjs-telegraf';
+import { Context, Scene, SceneEnter, Hears, Action } from 'nestjs-telegraf';
 import { UsersService } from 'src/users/users.service';
 import { Scenes } from 'telegraf';
 import { BotScenes } from '../../../constants';
@@ -59,18 +59,18 @@ export class TraderCardsScene {
 
     const { id } = ctx.message?.from;
     const user = await this.usersService.getUserByTelegramId(id);
-    const buttons: InlineKeyboardButton[][] = [
-      [{ text: 'asd', callback_data: 'qwe' }],
-      [{ text: 'asd', callback_data: 'qwe' }],
-      [{ text: 'asd', callback_data: 'qwe' }],
-      [{ text: 'asd', callback_data: 'qwe' }],
-      [{ text: 'asd', callback_data: 'qwe' }],
-    ];
+    const cards = user!.bankCards.slice(0, 33);
+    const buttons: InlineKeyboardButton[][] = cards.map<InlineKeyboardButton[]>(
+      (card) => [
+        { text: card.id.padStart(16, '0'), callback_data: `card${card.id}` },
+        { text: 'Изменить', callback_data: `card${card.id}` },
+        { text: 'Удалить', callback_data: `card${card.id}` },
+      ],
+    );
     const keyboard: InlineKeyboardMarkup = {
       inline_keyboard: buttons,
     };
-    await ctx.reply('Ваши карты', { reply_markup: keyboard });
-    await ctx.reply(`У вас ${user?.bankCards?.length || 0} карт`);
+    await ctx.reply(`У вас ${cards.length} карт`, { reply_markup: keyboard });
   }
 
   @Hears(TraderCardsCommands.addCard)
@@ -92,5 +92,20 @@ export class TraderCardsScene {
   @Hears(TraderCardsCommands.back)
   async leave(@Context() ctx: SceneContext) {
     await ctx.scene.enter(BotScenes.trader);
+  }
+
+  @Action(/card[0-9]{16}/)
+  async action(
+    @Context()
+    ctx: SceneContext & {
+      update: {
+        callback_query: {
+          data: string;
+        };
+      };
+    },
+  ) {
+    const data = ctx?.update?.callback_query?.data;
+    await ctx.answerCbQuery(data.slice(4));
   }
 }
