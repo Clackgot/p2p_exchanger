@@ -40,16 +40,31 @@ export class AddCardScene {
   }
 
   @WizardStep(0)
-  async getCardNumber(
+  async enterCardNumber(
     @Ctx()
     ctx: WizardContext,
     @Message() message: UserMessage,
   ) {
     if (isValidCardNumber(message?.text)) {
+      await ctx.reply('Отправьте имя держателя карты');
+      ctx.wizard.next();
+    } else {
+      await ctx.reply('Неверный формат карты. Попробуйте ещё раз');
+      return;
+    }
+  }
+
+  @WizardStep(1)
+  async enterCardHolder(
+    @Ctx()
+    ctx: WizardContext,
+    @Message() message: UserMessage,
+  ) {
+    if (message?.text && message?.text?.length > 2) {
       await ctx.reply('Карта добавлена');
       await this.leave(ctx);
     } else {
-      await ctx.reply('Неверный формат карты. Попробуйте ещё раз');
+      await ctx.reply('Неверное имя держателя карты. Попробуйте ещё раз');
       return;
     }
   }
