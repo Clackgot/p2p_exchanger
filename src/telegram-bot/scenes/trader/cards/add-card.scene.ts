@@ -9,7 +9,7 @@ import {
 } from 'nestjs-telegraf';
 import { UsersService } from 'src/users/users.service';
 import { BotScenes } from '../../../constants';
-import { WizardContext } from 'telegraf/typings/scenes';
+import { WizardContext, WizardSessionData } from 'telegraf/typings/scenes';
 import {
   KeyboardButton,
   ReplyKeyboardMarkup,
@@ -17,11 +17,19 @@ import {
 import { CardsService } from 'src/cards/cards.service';
 import { UserMessage } from 'src/telegram-bot/types/message.type';
 import { isValidCardNumber } from 'src/shared/utils/is-valid-card-number.util';
-import { Logger } from '@nestjs/common';
+import { Logger, NotFoundException } from '@nestjs/common';
+import { CreateCardDto } from './dto/create-card.dto';
+import { BankCard } from 'src/models/bank-card.model';
+import { formatCardNumber } from 'src/telegram-bot/utils/format-card-numer';
 
 enum AddCardCommands {
   back = 'Назад',
 }
+type AddCardSessionData = WizardSessionData & {
+  state: { card: CreateCardDto };
+};
+type AddCardContext = WizardContext<AddCardSessionData>;
+
 @Wizard(BotScenes.addCard)
 export class AddCardScene {
   constructor(
@@ -29,8 +37,9 @@ export class AddCardScene {
     private readonly usersService: UsersService,
   ) {}
   private logger: Logger = new Logger(this.constructor.name);
+
   @SceneEnter()
-  async showMenu(@Context() ctx: WizardContext) {
+  async showMenu(@Context() ctx: AddCardContext) {
     this.logger.log(
       `${ctx.message?.from.id} перешёл на сцену ${BotScenes.addCard}`,
     );
@@ -39,16 +48,19 @@ export class AddCardScene {
       keyboard: buttons,
       resize_keyboard: true,
     };
+    ctx.scene.session.state.card = new BankCard();
     await ctx.reply('Отправьте номер карты', { reply_markup: keyboard });
   }
 
   @WizardStep(0)
   async enterCardNumber(
     @Ctx()
-    ctx: WizardContext,
+    ctx: AddCardContext,
     @Message() message: UserMessage,
   ) {
     if (isValidCardNumber(message?.text)) {
+      ctx.scene.session.state.card.number = message?.text;
+
       await ctx.reply('Отправьте имя держателя карты');
       ctx.wizard.next();
     } else {
@@ -60,11 +72,30 @@ export class AddCardScene {
   @WizardStep(1)
   async enterCardHolder(
     @Ctx()
-    ctx: WizardContext,
+    ctx: AddCardContext,
     @Message() message: UserMessage,
   ) {
     if (message?.text && message?.text?.length > 2) {
-      await ctx.reply('Карта добавлена');
+      ctx.scene.session.state.card.holder = message.text;
+      const userId = ctx.message?.from?.id;
+      if (!userId) {
+        throw new NotFoundException(
+          'Не удалось найти пользователя в enterCardHolder',
+        );
+      }
+      const owner = await this.usersService.getUserByTelegramId(userId);
+      if (!owner) {
+        throw new NotFoundException(
+          'Не удалось найти пользователя в enterCardHolder',
+        );
+      }
+      ctx.scene.session.state.card.owner = owner;
+      const cardDto = ctx.scene.session.state.card;
+      const card = await this.cardsService.createCard(cardDto);
+      const replyMessage = `✨ Карта добавлена\n<b>💳 Номер</b>: ${formatCardNumber(
+        card.number,
+      )}\n<b>👤 Держатель</b>: ${card.holder}`;
+      await ctx.reply(replyMessage, { parse_mode: 'HTML' });
       await this.leave(ctx);
     } else {
       await ctx.reply('Неверное имя держателя карты. Попробуйте ещё раз');
@@ -73,11 +104,11 @@ export class AddCardScene {
   }
 
   @Hears(AddCardCommands.back)
-  async back(@Context() ctx: WizardContext) {
+  async back(@Context() ctx: AddCardContext) {
     await this.leave(ctx);
   }
 
-  async leave(@Context() ctx: WizardContext) {
+  async leave(@Context() ctx: AddCardContext) {
     return ctx.scene.enter(BotScenes.traderCards);
   }
 }
