@@ -1,10 +1,4 @@
-import {
-  Global,
-  Inject,
-  Injectable,
-  Module,
-  NotFoundException,
-} from '@nestjs/common';
+import { Module, NotFoundException } from '@nestjs/common';
 import { TelegramBotService } from './telegram-bot.service';
 import { TrongridModule } from 'src/providers/trongrid/trongrid.module';
 import { UsersModule } from 'src/users/users.module';
@@ -12,14 +6,14 @@ import { TelegrafModule, TelegrafModuleOptions } from 'nestjs-telegraf';
 import applicationConstants from 'src/config/applicationConstants';
 import { AdminScene } from './scenes/admin/admin.scene';
 import { AppUpdate } from './updates/app.update';
-import { Context, Middleware, session } from 'telegraf';
+import { session } from 'telegraf';
 import { MerchantScene } from './scenes/merchant/merchant.scene';
 import { TraderScene } from './scenes/trader/trader.scene';
 import { GuestScene } from './scenes/guest/guest.scene';
 import { TraderCardsScene } from './scenes/trader/cards/cards.scene';
 import { CardsModule } from 'src/cards/cards.module';
 import { AddCardScene } from './scenes/trader/cards/add-card.scene';
-import { SceneContext, WizardContext } from 'telegraf/typings/scenes';
+import { WizardContext } from 'telegraf/typings/scenes';
 import { UsersService } from 'src/users/users.service';
 
 @Module({

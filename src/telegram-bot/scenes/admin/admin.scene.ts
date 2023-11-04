@@ -1,4 +1,4 @@
-import { Context, Scene, SceneEnter, Action, Hears } from 'nestjs-telegraf';
+import { Context, Scene, SceneEnter, Hears } from 'nestjs-telegraf';
 import { TrongridService } from 'src/providers/trongrid/trongrid.service';
 import { UsersService } from 'src/users/users.service';
 import { Scenes } from 'telegraf';

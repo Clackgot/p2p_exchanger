@@ -5,7 +5,6 @@ import {
   IsUrl,
   IsEnum,
   IsString,
-  IsNumber,
   IsPort,
   IsBoolean,
 } from 'class-validator';

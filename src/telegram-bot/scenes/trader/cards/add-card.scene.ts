@@ -9,7 +9,7 @@ import {
 } from 'nestjs-telegraf';
 import { UsersService } from 'src/users/users.service';
 import { BotScenes } from '../../../constants';
-import { SceneContext, WizardContext } from 'telegraf/typings/scenes';
+import { WizardContext } from 'telegraf/typings/scenes';
 import {
   KeyboardButton,
   ReplyKeyboardMarkup,
@@ -17,7 +17,6 @@ import {
 import { CardsService } from 'src/cards/cards.service';
 import { UserMessage } from 'src/telegram-bot/types/message.type';
 import { isValidCardNumber } from 'src/shared/utils/is-valid-card-number.util';
-import { Middleware } from 'telegraf';
 
 enum AddCardCommands {
   back = 'Назад',
