@@ -2,7 +2,7 @@ import { Context, Scene, SceneEnter, Hears } from 'nestjs-telegraf';
 import { TrongridService } from 'src/providers/trongrid/trongrid.service';
 import { UsersService } from 'src/users/users.service';
 import { Scenes } from 'telegraf';
-import { BotScenes } from '../../constants';
+import { BotScenes } from '../../../constants';
 import { SceneContext } from 'telegraf/typings/scenes';
 import {
   KeyboardButton,
@@ -28,6 +28,7 @@ export class TraderCardsScene {
 
   @SceneEnter()
   async sayHello(@Context() ctx: Scenes.SceneContext) {
+    console.log('TraderCardsScene');
     if (!ctx.message?.from) return 'Не удалось найти пользователя';
 
     const { id } = ctx.message?.from;
@@ -62,16 +63,13 @@ export class TraderCardsScene {
   }
 
   @Hears(TraderCardsCommands.addCard)
-  async addCard(
-    @Context() ctx: SceneContext & { update: Update.CallbackQueryUpdate },
-  ) {
+  async addCard(@Context() ctx: SceneContext) {
     if (!ctx.message?.from) return 'Не удалось найти пользователя';
-
     const { id } = ctx.message?.from;
     const user = await this.usersService.getUserByTelegramId(id);
     // TODO: Добавить создание карты
     //this.cardsService.createCard();
-    await ctx.reply('Добавление карты');
+    await ctx.scene.enter(BotScenes.addCard);
   }
 
   @Hears(TraderCardsCommands.removeCard)

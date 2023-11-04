@@ -10,8 +10,9 @@ import { session } from 'telegraf';
 import { MerchantScene } from './scenes/merchant/merchant.scene';
 import { TraderScene } from './scenes/trader/trader.scene';
 import { GuestScene } from './scenes/guest/guest.scene';
-import { TraderCardsScene } from './scenes/trader/cards.scene';
+import { TraderCardsScene } from './scenes/trader/cards/cards.scene';
 import { CardsModule } from 'src/cards/cards.module';
+import { AddCardScene } from './scenes/trader/cards/add-card.scene';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { CardsModule } from 'src/cards/cards.module';
     TraderScene,
     AppUpdate,
     TraderCardsScene,
+    AddCardScene,
   ],
 })
 export class TelegramBotModule {}

@@ -15,7 +15,6 @@ export class AppUpdate {
   @Start()
   async start(ctx: SceneContext) {
     if (!ctx.message?.from) return ctx.reply('Не удалось найти пользователя');
-
     const { id, username } = ctx.message?.from;
     if (!id) return ctx.reply('Не удалось найти пользователя');
     let user = await this.usersService.getUserByTelegramId(id);

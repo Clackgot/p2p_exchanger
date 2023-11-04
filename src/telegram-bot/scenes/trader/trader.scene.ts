@@ -57,6 +57,6 @@ export class TraderScene {
 
   @Hears(TraderCommands.cardsMenu)
   async cardsMenu(@Context() ctx: SceneContext) {
-    await ctx.scene.enter(BotScenes.traderCards);
+    return ctx.scene.enter(BotScenes.traderCards);
   }
 }
