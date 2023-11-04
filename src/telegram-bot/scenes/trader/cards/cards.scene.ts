@@ -21,8 +21,8 @@ enum TraderCardsCommands {
   back = 'Назад',
 }
 const TraderCardsCallbackCommands = {
-  openCard: /open_card_[0-9]{16}/,
-  removeCard: /remove_card_[0-9]{16}/,
+  openCard: /open_card_([0-9]{16})/,
+  removeCard: /remove_card_([0-9]{16})/,
 };
 
 @Scene(BotScenes.traderCards)
@@ -113,8 +113,7 @@ export class TraderCardsScene {
     },
   ) {
     const data = ctx?.update?.callback_query?.data;
-    const regex = /open_card_([0-9]{16})/;
-    const match = data.match(regex);
+    const match = data.match(TraderCardsCallbackCommands.openCard);
 
     if (!match) {
       await ctx.reply('Не удалось получить номер карты');
@@ -140,6 +139,13 @@ export class TraderCardsScene {
     },
   ) {
     const data = ctx?.update?.callback_query?.data;
+    const match = data.match(TraderCardsCallbackCommands.removeCard);
+
+    if (!match) {
+      await ctx.reply('Не удалось получить номер карты');
+      await ctx.scene.leave();
+    }
+    const cardNumber = match![1];
     await ctx.answerCbQuery(`Удаляем карту`);
   }
 }

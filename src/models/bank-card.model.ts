@@ -1,10 +1,12 @@
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryColumn,
-  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.model';
 
@@ -24,4 +26,13 @@ export class BankCard {
   @ManyToOne(() => User, (user) => user.bankCards, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'owner' })
   owner: User;
+
+  @CreateDateColumn()
+  createdDate: Date;
+
+  @UpdateDateColumn()
+  updatedDate: Date;
+
+  @DeleteDateColumn()
+  deletedDate: Date;
 }
