@@ -4,6 +4,8 @@ import { Scenes } from 'telegraf';
 import { BotScenes } from '../../../constants';
 import { SceneContext } from 'telegraf/typings/scenes';
 import {
+  InlineKeyboardButton,
+  InlineKeyboardMarkup,
   KeyboardButton,
   ReplyKeyboardMarkup,
 } from 'telegraf/typings/core/types/typegram';
@@ -57,6 +59,17 @@ export class TraderCardsScene {
 
     const { id } = ctx.message?.from;
     const user = await this.usersService.getUserByTelegramId(id);
+    const buttons: InlineKeyboardButton[][] = [
+      [{ text: 'asd', callback_data: 'qwe' }],
+      [{ text: 'asd', callback_data: 'qwe' }],
+      [{ text: 'asd', callback_data: 'qwe' }],
+      [{ text: 'asd', callback_data: 'qwe' }],
+      [{ text: 'asd', callback_data: 'qwe' }],
+    ];
+    const keyboard: InlineKeyboardMarkup = {
+      inline_keyboard: buttons,
+    };
+    await ctx.reply('Ваши карты', { reply_markup: keyboard });
     await ctx.reply(`У вас ${user?.bankCards?.length || 0} карт`);
   }
 

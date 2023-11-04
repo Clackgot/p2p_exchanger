@@ -3,7 +3,7 @@ import { TelegrafModuleOptions, TelegrafOptionsFactory } from 'nestjs-telegraf';
 import applicationConstants from 'src/config/applicationConstants';
 
 import { UsersService } from 'src/users/users.service';
-import { SessionStore, session } from 'telegraf';
+import { Context, SessionStore, session } from 'telegraf';
 import { WizardContext } from 'telegraf/typings/scenes';
 import { Redis } from '@telegraf/session/redis';
 
@@ -15,9 +15,12 @@ export class TelegrafConfigurator implements TelegrafOptionsFactory {
   }
   private logger: Logger = new Logger(this.constructor.name);
 
-  private setUserRoleMiddleware = async (ctx: WizardContext, next: any) => {
+  private setUserRoleMiddleware = async (ctx: any, next: any) => {
     try {
-      const { id, username } = ctx.message!.from;
+      const id = ctx.message?.from?.id || ctx?.update?.callback_query?.from?.id;
+      const username =
+        ctx.message?.from?.username ||
+        ctx?.update?.callback_query?.from?.username;
       if (!id) throw new NotFoundException('Не удалось получить ID');
       let user = await this.usersService.getUserByTelegramId(id);
       if (!user) {
@@ -34,26 +37,34 @@ export class TelegrafConfigurator implements TelegrafOptionsFactory {
       this.logger.error(
         `Произошла ошибка в setUserRoleMiddleware: ${error.message}`,
       );
-      throw error;
+      ctx?.reply('Произошла неизвестная ошибка');
+      ctx?.scene?.leave();
     }
   };
 
   private loggerMiddleware = async (ctx: any, next: any) => {
     try {
-      const message = this.getMessageByType(ctx.message);
-      this.logger.verbose(`${ctx.message?.from.id}: ${message}`);
+      const id = ctx.message?.from?.id || ctx?.update?.callback_query?.from?.id;
+      const username =
+        ctx.message?.from?.username ||
+        ctx?.update?.callback_query?.from?.username;
+      const message = this.getMessageByType(ctx);
+      this.logger.verbose(`${username || id}: ${message}`);
       await next();
     } catch (error) {
       this.logger.error(
         `Произошла ошибка в loggerMiddleware: ${error.message}`,
       );
-      throw error;
+      ctx?.reply('Произошла неизвестная ошибка');
+      ctx?.scene?.leave();
     }
   };
 
-  private getMessageByType(message: any): string {
+  private getMessageByType(ctx: any): string {
+    if (ctx?.update?.callback_query) return '[Нажата кнопка]';
+    const { message } = ctx;
     const handlers: Record<string, string> = {
-      text: message.text || '[Не определено]',
+      text: message?.text || '[Не определено]',
       video_note: '[Кружок]',
       animation: '[Гифка]',
       voice: '[Голосовое сообщение]',
