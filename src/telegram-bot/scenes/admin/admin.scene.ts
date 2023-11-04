@@ -1,9 +1,6 @@
 import { Context, Scene, SceneEnter, Hears } from 'nestjs-telegraf';
-import { TrongridService } from 'src/providers/trongrid/trongrid.service';
 import { UsersService } from 'src/users/users.service';
-import { Scenes } from 'telegraf';
 import { BotScenes } from '../../constants';
-import { Update } from 'telegraf/typings/core/types/typegram';
 import { SceneContext } from 'telegraf/typings/scenes';
 
 enum AdminCommands {
@@ -13,13 +10,10 @@ enum AdminCommands {
 
 @Scene(BotScenes.admin)
 export class AdminScene {
-  constructor(
-    private readonly trongridService: TrongridService,
-    private readonly usersService: UsersService,
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @SceneEnter()
-  async step1(@Context() ctx: Scenes.SceneContext) {
+  async step1(@Context() ctx: SceneContext) {
     if (!ctx.message?.from) return 'Не удалось найти пользователя';
 
     const { id } = ctx.message?.from;
@@ -36,17 +30,13 @@ export class AdminScene {
   }
 
   @Hears(AdminCommands.getUsersCount)
-  async getUsersCount(
-    @Context() ctx: SceneContext & { update: Update.CallbackQueryUpdate },
-  ) {
+  async getUsersCount(@Context() ctx: SceneContext) {
     const users = await this.usersService.getAllUsers();
     await ctx.reply(`Пользователей в системе: ${users.length}`);
   }
 
   @Hears(AdminCommands.getMyBalance)
-  async getMyBalance(
-    @Context() ctx: SceneContext & { update: Update.CallbackQueryUpdate },
-  ) {
+  async getMyBalance(@Context() ctx: SceneContext) {
     const id = ctx.message?.from?.id;
     if (!id) return 'Не удалось получить баланс';
     const user = await this.usersService.getUserByTelegramId(id);
