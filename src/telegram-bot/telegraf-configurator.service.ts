@@ -4,13 +4,23 @@ import applicationConstants from 'src/config/applicationConstants';
 import { TrongridService } from 'src/providers/trongrid/trongrid.service';
 
 import { UsersService } from 'src/users/users.service';
-import { session } from 'telegraf';
+import { SessionStore, session } from 'telegraf';
 import { WizardContext, WizardSessionData } from 'telegraf/typings/scenes';
+import { Redis } from '@telegraf/session/redis';
 
 @Injectable()
 export class TelegrafConfigurator implements TelegrafOptionsFactory {
-  constructor(private readonly usersService: UsersService) {}
+  readonly store: SessionStore<any>;
+  constructor(private readonly usersService: UsersService) {
+    this.store = Redis({
+      url: `redis://${applicationConstants.REDIS.HOST}:${applicationConstants.REDIS.PORT}`,
+      config: {
+        password: applicationConstants.REDIS.PASSWORD,
+      },
+    });
+  }
   private logger: Logger = new Logger(this.constructor.name);
+
   private async setUserRoleMiddleware(ctx: WizardContext, next: any) {
     const id = ctx.message?.from.id;
     if (!id) throw new NotFoundException('Не удалось получить ID');
@@ -42,7 +52,6 @@ export class TelegrafConfigurator implements TelegrafOptionsFactory {
       sticker: '[Стикер]',
       default: '[Не определено]',
     };
-    console.log(message);
     const messageType =
       Object.keys(handlers).find((key) => message?.[key]) || 'default';
 
@@ -53,7 +62,7 @@ export class TelegrafConfigurator implements TelegrafOptionsFactory {
     return {
       token: applicationConstants.TELEGRAM.TELEGRAM_BOT_TOKEN,
       middlewares: [
-        session(),
+        session({ store: this.store }),
         this.setUserRoleMiddleware.bind(this),
         this.loggerMiddleware.bind(this),
       ],
