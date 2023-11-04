@@ -7,6 +7,7 @@ import {
   WizardStep,
   Ctx,
   Message,
+  SceneLeave,
 } from 'nestjs-telegraf';
 import { TrongridService } from 'src/providers/trongrid/trongrid.service';
 import { UsersService } from 'src/users/users.service';
@@ -34,33 +35,39 @@ export class AddCardScene {
 
   @SceneEnter()
   async showMenu(@Context() ctx: WizardContext) {
-    console.log('AddCardScene');
+    console.log(BotScenes.addCard);
+    const buttons: KeyboardButton[][] = [[{ text: AddCardCommands.back }]];
+    const keyboard: ReplyKeyboardMarkup = {
+      keyboard: buttons,
+      resize_keyboard: true,
+    };
+    await ctx.reply('Давайте добавим карту', { reply_markup: keyboard });
   }
 
-  @WizardStep(0)
-  async requestFirstNumber(
-    @Ctx()
-    ctx: WizardContext,
-    @Message() message: UserMessage,
-  ) {
-    console.log('requestFirstNumber');
-    await ctx.reply(`Введите первое число`);
-    ctx.wizard.next();
-  }
-  @WizardStep(1)
-  async readFirstNumber(
-    @Context() ctx: WizardContext,
-    @Message() message: UserMessage,
-  ) {
-    console.log('readFirstNumber');
+  // @WizardStep(0)
+  // async requestFirstNumber(
+  //   @Ctx()
+  //   ctx: WizardContext,
+  //   @Message() message: UserMessage,
+  // ) {
+  //   console.log('requestFirstNumber');
+  //   await ctx.reply(`Введите первое число`);
+  //   ctx.wizard.next();
+  // }
+  // @WizardStep(1)
+  // async readFirstNumber(
+  //   @Context() ctx: WizardContext,
+  //   @Message() message: UserMessage,
+  // ) {
+  //   console.log('readFirstNumber');
 
-    if (!isNaN(+message.text)) {
-      await ctx.reply('Карта добавлена');
-      await ctx.scene.leave();
-    } else {
-      ctx.wizard.back();
-    }
-  }
+  //   if (!isNaN(+message.text)) {
+  //     await ctx.reply('Карта добавлена');
+  //     await ctx.scene.leave();
+  //   } else {
+  //     ctx.wizard.back();
+  //   }
+  // }
   //   @WizardStep(2)
   //   async addCard(
   //     @Context() ctx: WizardContext & { update: Update.CallbackQueryUpdate },
@@ -89,6 +96,6 @@ export class AddCardScene {
   async back(
     @Context() ctx: WizardContext & { update: Update.CallbackQueryUpdate },
   ) {
-    await ctx.scene.leave();
+    await ctx.scene.enter(BotScenes.traderCards);
   }
 }

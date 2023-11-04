@@ -1,4 +1,4 @@
-import { Context, Scene, SceneEnter, Hears } from 'nestjs-telegraf';
+import { Context, Scene, SceneEnter, Hears, SceneLeave } from 'nestjs-telegraf';
 import { TrongridService } from 'src/providers/trongrid/trongrid.service';
 import { UsersService } from 'src/users/users.service';
 import { Scenes } from 'telegraf';
@@ -28,7 +28,7 @@ export class TraderCardsScene {
 
   @SceneEnter()
   async sayHello(@Context() ctx: Scenes.SceneContext) {
-    console.log('TraderCardsScene');
+    console.log(BotScenes.traderCards);
     if (!ctx.message?.from) return 'Не удалось найти пользователя';
 
     const { id } = ctx.message?.from;

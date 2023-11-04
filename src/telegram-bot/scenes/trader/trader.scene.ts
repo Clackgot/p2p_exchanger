@@ -24,6 +24,7 @@ export class TraderScene {
 
   @SceneEnter()
   async sayHello(@Context() ctx: Scenes.SceneContext) {
+    console.log(BotScenes.trader);
     if (!ctx.message?.from) return 'Не удалось найти пользователя';
 
     const { id } = ctx.message?.from;
