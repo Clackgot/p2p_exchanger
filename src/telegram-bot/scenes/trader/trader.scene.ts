@@ -27,9 +27,6 @@ export class TraderScene {
     console.log(BotScenes.trader);
     if (!ctx.message?.from) return 'Не удалось найти пользователя';
 
-    const { id } = ctx.message?.from;
-    const user = await this.usersService.getUserByTelegramId(id);
-
     const buttons: KeyboardButton[][] = [
       [
         { text: TraderCommands.getMyBalance },
@@ -41,7 +38,7 @@ export class TraderScene {
       resize_keyboard: true,
     };
 
-    await ctx.reply(`[${user?.role}] Добро пожаловать!`, {
+    await ctx.reply(`[${ctx.state.role}] Добро пожаловать!`, {
       reply_markup: keyboard,
     });
   }
