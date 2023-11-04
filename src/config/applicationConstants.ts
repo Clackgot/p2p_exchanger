@@ -53,13 +53,13 @@ class ApplicationConfig {
 
 class TelegramBotConfig {
   @IsTelegramBotToken()
-  TELEGRAM_BOT_TOKEN: string;
+  TOKEN: string;
 
   @IsString()
-  TELEGRAM_WEBHOOK_DOMAIN: string;
+  WEBHOOK_DOMAIN: string;
 
   @IsPort()
-  TELEGRAM_WEBHOOK_PORT: number;
+  WEBHOOK_PORT: number;
 }
 
 class TronAccount {
@@ -133,11 +133,9 @@ let applicationConstants: ApplicationConstants = {
   },
 
   TELEGRAM: {
-    TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN as string,
-    TELEGRAM_WEBHOOK_DOMAIN: process.env.TELEGRAM_WEBHOOK_DOMAIN as string,
-    TELEGRAM_WEBHOOK_PORT: parseInt(
-      process.env.TELEGRAM_WEBHOOK_PORT as string,
-    ),
+    TOKEN: process.env.TELEGRAM_BOT_TOKEN as string,
+    WEBHOOK_DOMAIN: process.env.TELEGRAM_WEBHOOK_DOMAIN as string,
+    WEBHOOK_PORT: parseInt(process.env.TELEGRAM_WEBHOOK_PORT as string),
   },
   APP: {
     PORT: parseInt(process.env.APP_PORT as string),

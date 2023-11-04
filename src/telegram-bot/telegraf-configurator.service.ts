@@ -77,7 +77,7 @@ export class TelegrafConfigurator implements TelegrafOptionsFactory {
 
   public createTelegrafOptions(): TelegrafModuleOptions {
     return {
-      token: applicationConstants.TELEGRAM.TELEGRAM_BOT_TOKEN,
+      token: applicationConstants.TELEGRAM.TOKEN,
       middlewares: [
         session({ store: this.store }),
         this.setUserRoleMiddleware.bind(this),
