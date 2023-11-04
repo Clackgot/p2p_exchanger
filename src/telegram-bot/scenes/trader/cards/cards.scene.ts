@@ -29,6 +29,7 @@ export class TraderCardsScene {
   @SceneEnter()
   async sayHello(@Context() ctx: Scenes.SceneContext) {
     console.log(BotScenes.traderCards);
+
     if (!ctx.message?.from) return 'Не удалось найти пользователя';
 
     const { id } = ctx.message?.from;
@@ -52,9 +53,7 @@ export class TraderCardsScene {
   }
 
   @Hears(TraderCardsCommands.getCards)
-  async getCards(
-    @Context() ctx: SceneContext & { update: Update.CallbackQueryUpdate },
-  ) {
+  async getCards(@Context() ctx: SceneContext) {
     if (!ctx.message?.from) return 'Не удалось найти пользователя';
 
     const { id } = ctx.message?.from;
@@ -73,23 +72,17 @@ export class TraderCardsScene {
   }
 
   @Hears(TraderCardsCommands.removeCard)
-  async removeCard(
-    @Context() ctx: SceneContext & { update: Update.CallbackQueryUpdate },
-  ) {
+  async removeCard(@Context() ctx: SceneContext) {
     await ctx.reply('Удаление карты');
   }
 
   @Hears(TraderCardsCommands.updateCard)
-  async updateCard(
-    @Context() ctx: SceneContext & { update: Update.CallbackQueryUpdate },
-  ) {
+  async updateCard(@Context() ctx: SceneContext) {
     await ctx.reply('Обновление карты');
   }
 
   @Hears(TraderCardsCommands.back)
-  async back(
-    @Context() ctx: SceneContext & { update: Update.CallbackQueryUpdate },
-  ) {
+  async leave(@Context() ctx: SceneContext) {
     await ctx.scene.enter(BotScenes.trader);
   }
 }
