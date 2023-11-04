@@ -16,7 +16,7 @@ export class TelegrafConfigurator implements TelegrafOptionsFactory {
     if (!id) throw new NotFoundException('Не удалось получить ID');
     const user = await this.usersService.getUserByTelegramId(id);
     if (!user) throw new NotFoundException('Не удалось найти пользователя');
-    ctx.state;
+    ctx.state.role = user.role;
     await next();
   }
 
