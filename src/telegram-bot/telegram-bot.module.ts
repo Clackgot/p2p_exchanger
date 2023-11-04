@@ -22,28 +22,6 @@ import { AddCardScene } from './scenes/trader/cards/add-card.scene';
 import { SceneContext, WizardContext } from 'telegraf/typings/scenes';
 import { UsersService } from 'src/users/users.service';
 
-@Injectable()
-export class RolesService {
-  constructor(private readonly usersService: UsersService) {}
-
-  setRole = async (ctx: WizardContext, next: any) => {
-    const id = ctx.message?.from.id;
-    if (!id) throw new NotFoundException('Не удалось получить ID');
-    const user = await this.usersService.getUserByTelegramId(id);
-    if (!user) throw new NotFoundException('Не удалось найти пользователя');
-    ctx.state.role = user.role;
-    await next();
-  };
-}
-
-@Injectable()
-export class RolesService2 {
-  setRole = async (ctx: WizardContext, next: any) => {
-    ctx.state.role = 'TEST';
-    await next();
-  };
-}
-
 @Module({
   imports: [
     TrongridModule,
@@ -80,7 +58,6 @@ export class RolesService2 {
     AppUpdate,
     TraderCardsScene,
     AddCardScene,
-    RolesService,
   ],
 })
 export class TelegramBotModule {}
