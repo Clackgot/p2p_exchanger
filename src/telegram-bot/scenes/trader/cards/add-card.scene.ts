@@ -59,7 +59,7 @@ export class AddCardScene {
     @Message() message: UserMessage,
   ) {
     if (isValidCardNumber(message?.text)) {
-      ctx.scene.session.state.card.number = message?.text;
+      ctx.scene.session.state.card.id = message?.text;
 
       await ctx.reply('Отправьте имя держателя карты');
       ctx.wizard.next();

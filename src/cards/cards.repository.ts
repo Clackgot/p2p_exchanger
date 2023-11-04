@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BankCard } from 'src/models/bank-card.model';
 import { User } from 'src/models/user.model';
@@ -27,6 +31,13 @@ export class CardsRepository {
   }
 
   async createCard(dto: CreateCardDto): Promise<BankCard> {
+    const { id } = dto;
+    const exsistCard = await this.bankCardsRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    if (exsistCard) throw new ConflictException(`Карта ${id} уже существует`);
     return this.bankCardsRepository.save(dto);
   }
 }

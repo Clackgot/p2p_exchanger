@@ -3,6 +3,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  PrimaryColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './user.model';
@@ -11,11 +12,8 @@ import { User } from './user.model';
   name: 'bank_cards',
 })
 export class BankCard {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn({ type: 'bigint' })
   id: string;
-
-  @Column({ name: 'number', nullable: false })
-  number: string;
 
   @Column({ name: 'holder', nullable: false })
   holder: string;

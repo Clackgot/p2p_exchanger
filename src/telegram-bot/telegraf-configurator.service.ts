@@ -17,10 +17,17 @@ export class TelegrafConfigurator implements TelegrafOptionsFactory {
 
   private setUserRoleMiddleware = async (ctx: WizardContext, next: any) => {
     try {
-      const id = ctx.message?.from.id;
+      const { id, username } = ctx.message!.from;
       if (!id) throw new NotFoundException('Не удалось получить ID');
-      const user = await this.usersService.getUserByTelegramId(id);
-      if (!user) throw new NotFoundException('Не удалось найти пользователя');
+      let user = await this.usersService.getUserByTelegramId(id);
+      if (!user) {
+        user = await this.usersService.createUser({
+          telegramUser: {
+            id,
+            username,
+          },
+        });
+      }
       ctx.state.role = user.role;
       await next();
     } catch (error) {
