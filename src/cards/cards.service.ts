@@ -18,4 +18,7 @@ export class CardsService {
   async createCard(dto: CreateCardDto): Promise<BankCard> {
     return this.cardsRepository.createCard(dto);
   }
+  async getCardById(id: string): Promise<BankCard> {
+    return this.cardsRepository.getCardById(id);
+  }
 }

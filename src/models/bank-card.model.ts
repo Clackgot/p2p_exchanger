@@ -12,7 +12,7 @@ import { User } from './user.model';
   name: 'bank_cards',
 })
 export class BankCard {
-  @PrimaryColumn({ type: 'bigint' })
+  @PrimaryColumn({ type: 'text' })
   id: string;
 
   @Column({ name: 'holder', nullable: false })

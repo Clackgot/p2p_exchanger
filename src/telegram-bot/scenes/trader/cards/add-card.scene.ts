@@ -20,7 +20,7 @@ import { isValidCardNumber } from 'src/shared/utils/is-valid-card-number.util';
 import { Logger, NotFoundException } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
 import { BankCard } from 'src/models/bank-card.model';
-import { createdCardMessage } from './utils/messages';
+import { displayCardMessage } from './utils/messages';
 
 enum AddCardCommands {
   back = 'Назад',
@@ -93,7 +93,7 @@ export class AddCardScene {
         ctx.scene.session.state.card.owner = owner;
         const cardDto = ctx.scene.session.state.card;
         const card = await this.cardsService.createCard(cardDto);
-        const replyMessage = createdCardMessage(card);
+        const replyMessage = displayCardMessage(card);
         await ctx.reply(replyMessage, {
           parse_mode: 'HTML',
         });

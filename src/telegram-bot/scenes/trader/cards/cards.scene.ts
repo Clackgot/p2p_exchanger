@@ -11,6 +11,7 @@ import {
 } from 'telegraf/typings/core/types/typegram';
 import { CardsService } from 'src/cards/cards.service';
 import { Logger } from '@nestjs/common';
+import { displayCardMessage } from './utils/messages';
 
 enum TraderCardsCommands {
   getCards = 'Список карт',
@@ -19,6 +20,10 @@ enum TraderCardsCommands {
   updateCard = 'Изменить карту',
   back = 'Назад',
 }
+const TraderCardsCallbackCommands = {
+  openCard: /open_card_[0-9]{16}/,
+  removeCard: /remove_card_[0-9]{16}/,
+};
 
 @Scene(BotScenes.traderCards)
 export class TraderCardsScene {
@@ -59,12 +64,14 @@ export class TraderCardsScene {
 
     const { id } = ctx.message?.from;
     const user = await this.usersService.getUserByTelegramId(id);
-    const cards = user!.bankCards.slice(0, 33);
+    const cards = user!.bankCards.slice(0, 50);
     const buttons: InlineKeyboardButton[][] = cards.map<InlineKeyboardButton[]>(
       (card) => [
-        { text: card.id.padStart(16, '0'), callback_data: `card${card.id}` },
-        { text: 'Изменить', callback_data: `card${card.id}` },
-        { text: 'Удалить', callback_data: `card${card.id}` },
+        {
+          text: card.id,
+          callback_data: `open_card_${card.id}`,
+        },
+        { text: 'Удалить', callback_data: `remove_card_${card.id}` },
       ],
     );
     const keyboard: InlineKeyboardMarkup = {
@@ -94,8 +101,8 @@ export class TraderCardsScene {
     await ctx.scene.enter(BotScenes.trader);
   }
 
-  @Action(/card[0-9]{16}/)
-  async action(
+  @Action(TraderCardsCallbackCommands.openCard)
+  async open(
     @Context()
     ctx: SceneContext & {
       update: {
@@ -106,6 +113,33 @@ export class TraderCardsScene {
     },
   ) {
     const data = ctx?.update?.callback_query?.data;
-    await ctx.answerCbQuery(data.slice(4));
+    const regex = /open_card_([0-9]{16})/;
+    const match = data.match(regex);
+
+    if (!match) {
+      await ctx.reply('Не удалось получить номер карты');
+      await ctx.scene.leave();
+    }
+    const cardNumber = match![1];
+
+    const card = await this.cardsService.getCardById(cardNumber);
+    const replyMessage = displayCardMessage(card);
+    await ctx.reply(replyMessage, { parse_mode: 'HTML' });
+    await ctx.answerCbQuery();
+  }
+
+  @Action(TraderCardsCallbackCommands.removeCard)
+  async remove(
+    @Context()
+    ctx: SceneContext & {
+      update: {
+        callback_query: {
+          data: string;
+        };
+      };
+    },
+  ) {
+    const data = ctx?.update?.callback_query?.data;
+    await ctx.answerCbQuery(`Удаляем карту`);
   }
 }
