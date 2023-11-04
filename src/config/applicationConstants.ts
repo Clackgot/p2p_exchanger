@@ -38,6 +38,15 @@ class DatabaseConfig {
   SYNCHRONIZE: boolean;
 }
 
+class RedisConfig {
+  @IsString()
+  HOST: string;
+  @IsPort()
+  PORT: number;
+  @IsString()
+  PASSWORD: string;
+}
+
 class ApplicationConfig {
   @IsPort()
   PORT: number;
@@ -101,6 +110,8 @@ class ApplicationConstants {
   APP: ApplicationConfig;
 
   DATABASE: DatabaseConfig;
+
+  REDIS: RedisConfig;
 }
 
 let applicationConstants: ApplicationConstants = {
@@ -140,6 +151,12 @@ let applicationConstants: ApplicationConstants = {
     PASSWORD: process.env['DB_PASSWORD'] as string,
     NAME: process.env['DB_NAME'] as string,
     SYNCHRONIZE: Boolean(process.env['DB_SYNCHRONIZE'] as string),
+  },
+
+  REDIS: {
+    HOST: process.env['REDIS_HOST'] as string,
+    PORT: parseInt(process.env['REDIS_PORT'] as string),
+    PASSWORD: process.env['REDIS_PASSWORD'] as string,
   },
 };
 

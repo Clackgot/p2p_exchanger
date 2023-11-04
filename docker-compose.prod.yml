@@ -32,6 +32,14 @@ services:
     env_file:
       - .env.prod
 
+  redis:
+    container_name: exchanger_redis
+    image: redis:7.2.3
+    restart: always
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - exchanger_redis_volume:/data
+
   pgAdmin:
     container_name: exchanger_db_pgadmin4
     image: dpage/pgadmin4
@@ -47,6 +55,8 @@ services:
 volumes:
   exchanger_db_volume:
     name: exchanger_db_volume
+  exchanger_redis_volume:
+    name: exchanger_redis_volume
 
 networks:
   exchanger_network:

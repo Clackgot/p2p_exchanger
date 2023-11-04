@@ -20,6 +20,16 @@ services:
     networks:
       - exchanger_network_dev
 
+  redis:
+    container_name: exchanger_redis_dev
+    image: redis:7.2.3
+    restart: always
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - exchanger_redis_volume_dev:/data
+
   pgAdmin:
     container_name: exchanger_db_pgadmin4_dev
     image: dpage/pgadmin4
@@ -35,6 +45,8 @@ services:
 volumes:
   exchanger_db_volume_dev:
     name: exchanger_db_volume_dev
+  exchanger_redis_volume_dev:
+    name: exchanger_redis_volume_dev
 
 networks:
   exchanger_network_dev:

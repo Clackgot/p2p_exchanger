@@ -13,6 +13,13 @@ import { GuestScene } from './scenes/guest/guest.scene';
 import { TraderCardsScene } from './scenes/trader/cards/cards.scene';
 import { CardsModule } from 'src/cards/cards.module';
 import { AddCardScene } from './scenes/trader/cards/add-card.scene';
+import { Redis } from '@telegraf/session/redis';
+const store = Redis({
+  url: `redis://${applicationConstants.REDIS.HOST}:${applicationConstants.REDIS.PORT}`,
+  config: {
+    password: applicationConstants.REDIS.PASSWORD,
+  },
+});
 
 @Module({
   imports: [
@@ -21,7 +28,7 @@ import { AddCardScene } from './scenes/trader/cards/add-card.scene';
     CardsModule,
     TelegrafModule.forRoot({
       token: applicationConstants.TELEGRAM.TELEGRAM_BOT_TOKEN,
-      middlewares: [session()],
+      middlewares: [session({ store })],
     }),
   ],
   providers: [
