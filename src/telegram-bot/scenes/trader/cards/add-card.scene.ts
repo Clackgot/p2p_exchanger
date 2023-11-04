@@ -17,6 +17,7 @@ import {
 import { CardsService } from 'src/cards/cards.service';
 import { UserMessage } from 'src/telegram-bot/types/message.type';
 import { isValidCardNumber } from 'src/shared/utils/is-valid-card-number.util';
+import { Logger } from '@nestjs/common';
 
 enum AddCardCommands {
   back = 'Назад',
@@ -27,10 +28,12 @@ export class AddCardScene {
     private readonly cardsService: CardsService,
     private readonly usersService: UsersService,
   ) {}
-
+  private logger: Logger = new Logger(this.constructor.name);
   @SceneEnter()
   async showMenu(@Context() ctx: WizardContext) {
-    console.log(BotScenes.addCard);
+    this.logger.log(
+      `${ctx.message?.from.id} перешёл на сцену ${BotScenes.addCard}`,
+    );
     const buttons: KeyboardButton[][] = [[{ text: AddCardCommands.back }]];
     const keyboard: ReplyKeyboardMarkup = {
       keyboard: buttons,
@@ -75,6 +78,6 @@ export class AddCardScene {
   }
 
   async leave(@Context() ctx: WizardContext) {
-    await ctx.scene.enter(BotScenes.traderCards);
+    return ctx.scene.enter(BotScenes.traderCards);
   }
 }

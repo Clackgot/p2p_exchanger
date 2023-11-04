@@ -9,6 +9,7 @@ import {
   ReplyKeyboardMarkup,
   Update,
 } from 'telegraf/typings/core/types/typegram';
+import { Logger } from '@nestjs/common';
 
 enum TraderCommands {
   getMyBalance = 'Узнать баланс',
@@ -21,10 +22,12 @@ export class TraderScene {
     private readonly trongridService: TrongridService,
     private readonly usersService: UsersService,
   ) {}
-
+  private logger: Logger = new Logger(this.constructor.name);
   @SceneEnter()
   async sayHello(@Context() ctx: Scenes.SceneContext) {
-    console.log(BotScenes.trader);
+    this.logger.log(
+      `${ctx.message?.from.id} перешёл на сцену ${BotScenes.trader}`,
+    );
     if (!ctx.message?.from) return 'Не удалось найти пользователя';
 
     const buttons: KeyboardButton[][] = [

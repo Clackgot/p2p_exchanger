@@ -8,6 +8,7 @@ import {
   ReplyKeyboardMarkup,
 } from 'telegraf/typings/core/types/typegram';
 import { CardsService } from 'src/cards/cards.service';
+import { Logger } from '@nestjs/common';
 
 enum TraderCardsCommands {
   getCards = 'Список карт',
@@ -23,11 +24,13 @@ export class TraderCardsScene {
     private readonly cardsService: CardsService,
     private readonly usersService: UsersService,
   ) {}
+  private logger: Logger = new Logger(this.constructor.name);
 
   @SceneEnter()
   async sayHello(@Context() ctx: Scenes.SceneContext) {
-    console.log(BotScenes.traderCards);
-
+    this.logger.log(
+      `${ctx.message?.from.id} перешёл на сцену ${BotScenes.traderCards}`,
+    );
     if (!ctx.message?.from) return 'Не удалось найти пользователя';
 
     const buttons: KeyboardButton[][] = [
