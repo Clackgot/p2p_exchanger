@@ -75,31 +75,36 @@ export class AddCardScene {
     ctx: AddCardContext,
     @Message() message: UserMessage,
   ) {
-    if (message?.text && message?.text?.length > 2) {
-      ctx.scene.session.state.card.holder = message.text;
-      const userId = ctx.message?.from?.id;
-      if (!userId) {
-        throw new NotFoundException(
-          'Не удалось найти пользователя в enterCardHolder',
-        );
+    try {
+      if (message?.text && message?.text?.length > 2) {
+        ctx.scene.session.state.card.holder = message.text;
+        const userId = ctx.message?.from?.id;
+        if (!userId) {
+          throw new NotFoundException(
+            'Не удалось найти пользователя в enterCardHolder',
+          );
+        }
+        const owner = await this.usersService.getUserByTelegramId(userId);
+        if (!owner) {
+          throw new NotFoundException(
+            'Не удалось найти пользователя в enterCardHolder',
+          );
+        }
+        ctx.scene.session.state.card.owner = owner;
+        const cardDto = ctx.scene.session.state.card;
+        const card = await this.cardsService.createCard(cardDto);
+        const replyMessage = getCreatedCardNumberMessage(card);
+        await ctx.reply(replyMessage, {
+          parse_mode: 'HTML',
+        });
+        await this.leave(ctx);
+      } else {
+        await ctx.reply('Неверное имя держателя карты. Попробуйте ещё раз');
+        return;
       }
-      const owner = await this.usersService.getUserByTelegramId(userId);
-      if (!owner) {
-        throw new NotFoundException(
-          'Не удалось найти пользователя в enterCardHolder',
-        );
-      }
-      ctx.scene.session.state.card.owner = owner;
-      const cardDto = ctx.scene.session.state.card;
-      const card = await this.cardsService.createCard(cardDto);
-      const replyMessage = getCreatedCardNumberMessage(card);
-      await ctx.reply(replyMessage, {
-        parse_mode: 'HTML',
-      });
+    } catch (err) {
+      await ctx.reply(err.message);
       await this.leave(ctx);
-    } else {
-      await ctx.reply('Неверное имя держателя карты. Попробуйте ещё раз');
-      return;
     }
   }
 
