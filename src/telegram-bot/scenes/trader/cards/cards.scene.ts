@@ -149,7 +149,10 @@ export class TraderCardsScene {
       await ctx.reply('Не удалось получить номер карты');
       return ctx.scene.leave();
     }
-    const cardNumber = match[1];
-    await ctx.answerCbQuery(`Удаляем карту ${cardNumber}`);
+    const id = match[1];
+    const card = await this.cardsService.removeCard({ id });
+    const message = displayCardMessage(card);
+    await ctx.reply(message, { parse_mode: 'HTML' });
+    await ctx.answerCbQuery(`Карта ${id} удалена`);
   }
 }

@@ -32,7 +32,4 @@ export class BankCard {
 
   @UpdateDateColumn()
   updatedDate: Date;
-
-  @DeleteDateColumn()
-  deletedDate: Date;
 }

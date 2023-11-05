@@ -26,7 +26,4 @@ export class CardsService {
   async removeCard(dto: RemoveCardDto): Promise<BankCard> {
     return this.cardsRepository.removeCard(dto);
   }
-  async recoverCard(dto: RecoverCardDto): Promise<any> {
-    return this.cardsRepository.recoverCard(dto);
-  }
 }

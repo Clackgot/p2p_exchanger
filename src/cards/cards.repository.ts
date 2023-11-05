@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -53,22 +54,17 @@ export class CardsRepository {
     return card;
   }
 
-  async removeCard(dto: RemoveCardDto): Promise<any> {
-    const { id } = dto;
-    const card = await this.getCardById(id);
-    return this.bankCardsRepository.softRemove(card);
-  }
-
-  async recoverCard(dto: RecoverCardDto): Promise<any> {
-    const { id } = dto;
-    const card = await this.bankCardsRepository.findOne({
-      where: { id },
-      withDeleted: true,
-    });
-
-    if (!card) throw new NotFoundException(`Карта ${id} не найдена`);
-    if (!card.deletedDate)
-      throw new BadRequestException(`Карта ${id} не удалена`);
-    return this.bankCardsRepository.recover(card);
+  async removeCard(dto: RemoveCardDto): Promise<BankCard> {
+    try {
+      const { id } = dto;
+      const card = await this.getCardById(id);
+      const removedCard = await this.bankCardsRepository.remove(card);
+      removedCard.id = id;
+      return removedCard;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Не удалось удалить карту ${dto?.id}`,
+      );
+    }
   }
 }

@@ -40,9 +40,4 @@ export class CardsController {
   async removeCard(@Param() dto: RemoveCardDto): Promise<BankCard> {
     return this.cardsService.removeCard(dto);
   }
-
-  @Patch('/:id')
-  async recoverCard(@Param() dto: RecoverCardDto): Promise<any> {
-    return this.cardsService.recoverCard(dto);
-  }
 }
