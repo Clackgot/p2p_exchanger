@@ -49,7 +49,10 @@ export class AddCardScene {
       resize_keyboard: true,
     };
     ctx.scene.session.state.card = new BankCard();
-    await ctx.reply('Отправьте номер карты', { reply_markup: keyboard });
+    await ctx.reply(
+      'Отправьте номер карты в формате:\n<code>4850786244873854 Eden Sawicki</code>',
+      { reply_markup: keyboard, parse_mode: 'HTML' },
+    );
   }
 
   @WizardStep(0)
@@ -68,6 +71,7 @@ export class AddCardScene {
         throw new NotFoundException('Не удалось найти пользователя');
       }
       const cardDto = parseCardNumber(message.text);
+
       const card = await this.cardsService.createCard({ ...cardDto, owner });
       const replyMessage = displayCardMessage(card);
       await ctx.reply(replyMessage, {

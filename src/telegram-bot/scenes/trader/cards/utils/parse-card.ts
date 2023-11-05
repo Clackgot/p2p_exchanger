@@ -15,5 +15,5 @@ export const parseCardNumber = (
       holder,
     };
   }
-  throw new BadRequestException('Неверный формат. Попробуй ещё раз');
+  throw new BadRequestException('Неверный формат');
 };
