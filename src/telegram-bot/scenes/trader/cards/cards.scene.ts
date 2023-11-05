@@ -16,8 +16,6 @@ import { displayCardMessage } from './utils/messages';
 enum TraderCardsCommands {
   getCards = 'Список карт',
   addCard = 'Добавить карту',
-  removeCard = 'Удалить карту',
-  updateCard = 'Изменить карту',
   back = 'Назад',
 }
 const TraderCardsCallbackCommands = {
@@ -44,10 +42,6 @@ export class TraderCardsScene {
       [
         { text: TraderCardsCommands.getCards },
         { text: TraderCardsCommands.addCard },
-      ],
-      [
-        { text: TraderCardsCommands.removeCard },
-        { text: TraderCardsCommands.updateCard },
       ],
       [{ text: TraderCardsCommands.back }],
     ];
@@ -88,16 +82,6 @@ export class TraderCardsScene {
   async addCard(@Context() ctx: SceneContext) {
     if (!ctx.message?.from) return 'Не удалось найти пользователя';
     await ctx.scene.enter(BotScenes.addCard);
-  }
-
-  @Hears(TraderCardsCommands.removeCard)
-  async removeCard(@Context() ctx: SceneContext) {
-    await ctx.reply('Удаление карты');
-  }
-
-  @Hears(TraderCardsCommands.updateCard)
-  async updateCard(@Context() ctx: SceneContext) {
-    await ctx.reply('Обновление карты');
   }
 
   @Hears(TraderCardsCommands.back)

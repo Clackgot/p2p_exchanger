@@ -16,11 +16,11 @@ import {
 } from 'telegraf/typings/core/types/typegram';
 import { CardsService } from 'src/cards/cards.service';
 import { UserMessage } from 'src/telegram-bot/types/message.type';
-import { isValidCardNumber } from 'src/shared/utils/is-valid-card-number.util';
-import { Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
 import { BankCard } from 'src/models/bank-card.model';
 import { displayCardMessage } from './utils/messages';
+import { parseCardNumber } from './utils/parse-card';
 
 enum AddCardCommands {
   back = 'Назад',
@@ -53,58 +53,32 @@ export class AddCardScene {
   }
 
   @WizardStep(0)
-  async enterCardNumber(
-    @Ctx()
-    ctx: AddCardContext,
-    @Message() message: UserMessage,
-  ) {
-    if (isValidCardNumber(message?.text)) {
-      ctx.scene.session.state.card.id = message?.text;
-
-      await ctx.reply('Отправьте имя держателя карты');
-      ctx.wizard.next();
-    } else {
-      await ctx.reply('Неверный формат карты. Попробуйте ещё раз');
-      return;
-    }
-  }
-
-  @WizardStep(1)
-  async enterCardHolder(
+  async enterCard(
     @Ctx()
     ctx: AddCardContext,
     @Message() message: UserMessage,
   ) {
     try {
-      if (message?.text && message?.text?.length > 2) {
-        ctx.scene.session.state.card.holder = message.text;
-        const userId = ctx.message?.from?.id;
-        if (!userId) {
-          throw new NotFoundException(
-            'Не удалось найти пользователя в enterCardHolder',
-          );
-        }
-        const owner = await this.usersService.getUserByTelegramId(userId);
-        if (!owner) {
-          throw new NotFoundException(
-            'Не удалось найти пользователя в enterCardHolder',
-          );
-        }
-        ctx.scene.session.state.card.owner = owner;
-        const cardDto = ctx.scene.session.state.card;
-        const card = await this.cardsService.createCard(cardDto);
-        const replyMessage = displayCardMessage(card);
-        await ctx.reply(replyMessage, {
-          parse_mode: 'HTML',
-        });
-        await this.leave(ctx);
-      } else {
-        await ctx.reply('Неверное имя держателя карты. Попробуйте ещё раз');
-        return;
+      const userId = ctx.message?.from?.id;
+      if (!userId) {
+        throw new NotFoundException('Не удалось найти пользователя');
       }
-    } catch (err) {
-      await ctx.reply(err.message);
-      await this.leave(ctx);
+      const owner = await this.usersService.getUserByTelegramId(userId);
+      if (!owner) {
+        throw new NotFoundException('Не удалось найти пользователя');
+      }
+      const cardDto = parseCardNumber(message.text);
+      const card = await this.cardsService.createCard({ ...cardDto, owner });
+      const replyMessage = displayCardMessage(card);
+      await ctx.reply(replyMessage, {
+        parse_mode: 'HTML',
+      });
+      await ctx.scene.enter(BotScenes.traderCards);
+    } catch (error) {
+      await Promise.all([
+        ctx.reply(error.message),
+        ctx.scene.enter(BotScenes.traderCards),
+      ]);
     }
   }
 
