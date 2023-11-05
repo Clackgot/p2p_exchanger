@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -9,6 +10,8 @@ import { User } from 'src/models/user.model';
 import { Repository } from 'typeorm';
 import { GetCardsByUserIdDto } from './dto/get-cards-by-user-id.dto';
 import { CreateCardDto } from './dto/create-card.dto';
+import { RemoveCardDto } from './dto/remove-card.dto';
+import { RecoverCardDto } from './dto/recover-card.dto';
 
 @Injectable()
 export class CardsRepository {
@@ -48,5 +51,24 @@ export class CardsRepository {
     });
     if (!card) throw new NotFoundException(`Карта ${id} не найдена`);
     return card;
+  }
+
+  async removeCard(dto: RemoveCardDto): Promise<any> {
+    const { id } = dto;
+    const card = await this.getCardById(id);
+    return this.bankCardsRepository.softRemove(card);
+  }
+
+  async recoverCard(dto: RecoverCardDto): Promise<any> {
+    const { id } = dto;
+    const card = await this.bankCardsRepository.findOne({
+      where: { id },
+      withDeleted: true,
+    });
+
+    if (!card) throw new NotFoundException(`Карта ${id} не найдена`);
+    if (!card.deletedDate)
+      throw new BadRequestException(`Карта ${id} не удалена`);
+    return this.bankCardsRepository.recover(card);
   }
 }

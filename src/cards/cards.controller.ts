@@ -1,8 +1,19 @@
-import { Controller, Param, Get, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Param,
+  Get,
+  Post,
+  Body,
+  Delete,
+  Query,
+  Patch,
+} from '@nestjs/common';
 import { CardsService } from './cards.service';
 import { GetCardsByUserIdDto } from './dto/get-cards-by-user-id.dto';
 import { BankCard } from 'src/models/bank-card.model';
 import { CreateCardDto } from './dto/create-card.dto';
+import { RemoveCardDto } from './dto/remove-card.dto';
+import { RecoverCardDto } from './dto/recover-card.dto';
 
 @Controller('cards')
 export class CardsController {
@@ -23,5 +34,15 @@ export class CardsController {
   @Post()
   async createCard(@Body() dto: CreateCardDto): Promise<BankCard> {
     return this.cardsService.createCard(dto);
+  }
+
+  @Delete('/:id')
+  async removeCard(@Param() dto: RemoveCardDto): Promise<BankCard> {
+    return this.cardsService.removeCard(dto);
+  }
+
+  @Patch('/:id')
+  async recoverCard(@Param() dto: RecoverCardDto): Promise<any> {
+    return this.cardsService.recoverCard(dto);
   }
 }

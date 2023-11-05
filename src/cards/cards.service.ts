@@ -3,6 +3,8 @@ import { CardsRepository } from './cards.repository';
 import { GetCardsByUserIdDto } from './dto/get-cards-by-user-id.dto';
 import { BankCard } from 'src/models/bank-card.model';
 import { CreateCardDto } from './dto/create-card.dto';
+import { RemoveCardDto } from './dto/remove-card.dto';
+import { RecoverCardDto } from './dto/recover-card.dto';
 
 @Injectable()
 export class CardsService {
@@ -20,5 +22,11 @@ export class CardsService {
   }
   async getCardById(id: string): Promise<BankCard> {
     return this.cardsRepository.getCardById(id);
+  }
+  async removeCard(dto: RemoveCardDto): Promise<BankCard> {
+    return this.cardsRepository.removeCard(dto);
+  }
+  async recoverCard(dto: RecoverCardDto): Promise<any> {
+    return this.cardsRepository.recoverCard(dto);
   }
 }
