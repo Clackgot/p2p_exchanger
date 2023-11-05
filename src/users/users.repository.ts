@@ -2,10 +2,11 @@ import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/models/user.model';
 import { EntityManager, Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
 import { Balance } from 'src/models/balance.model';
 import { TronAccount } from 'src/models/tron-account.model';
 import { TronwebService } from 'src/providers/tronweb/tronweb.service';
+import { CreateUserByTelegramDto } from './dto/create-user-by-telegram.dto';
+import { TelegramUser } from 'src/models/telegram-user.model';
 
 @Injectable()
 export class UsersRepository {
@@ -29,9 +30,9 @@ export class UsersRepository {
     });
   }
 
-  async createUser(dto: CreateUserDto): Promise<User> {
+  async createUserByTelegram(dto: CreateUserByTelegramDto): Promise<User> {
     const manager = this.usersRepository.manager;
-    const { id } = dto.telegramUser;
+    const { id, username } = dto;
     const exsistUser = await this.getUserByTelegramId(id);
 
     if (exsistUser) {
@@ -50,7 +51,9 @@ export class UsersRepository {
         user.balance.usdt = 0;
         user.balance.trx = 0;
 
-        user.telegramUser = dto.telegramUser;
+        user.telegramUser = new TelegramUser();
+        user.telegramUser.id = id;
+        user.telegramUser.username = username;
         user.tronAccount = tronAccount;
 
         return entityManager.save(user);

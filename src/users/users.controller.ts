@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from 'src/models/user.model';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserByTelegramDto } from './dto/create-user-by-telegram.dto';
 
 @Controller('users')
 export class UsersController {
@@ -13,7 +13,9 @@ export class UsersController {
   }
 
   @Post()
-  async createUser(@Body() dto: CreateUserDto): Promise<User> {
-    return this.usersService.createUser(dto);
+  async createUserByTelegram(
+    @Body() dto: CreateUserByTelegramDto,
+  ): Promise<User> {
+    return this.usersService.createUserByTelegram(dto);
   }
 }

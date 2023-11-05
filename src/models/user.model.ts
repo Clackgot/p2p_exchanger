@@ -1,10 +1,13 @@
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { TelegramUser } from './telegram-user.model';
 import { TronAccount } from './tron-account.model';
@@ -64,4 +67,13 @@ export class User {
   })
   @JoinColumn({ name: 'bank_cards' })
   bankCards: BankCard[];
+
+  @CreateDateColumn()
+  createdDate: Date;
+
+  @UpdateDateColumn()
+  updatedDate: Date;
+
+  @DeleteDateColumn()
+  deletedDate: Date;
 }

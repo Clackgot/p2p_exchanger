@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Body, Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { User } from 'src/models/user.model';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserByTelegramDto } from './dto/create-user-by-telegram.dto';
 
 @Injectable()
 export class UsersService {
@@ -11,10 +11,13 @@ export class UsersService {
     return this.usersRepository.getAllUsers();
   }
 
-  async createUser(dto: CreateUserDto): Promise<User> {
-    return this.usersRepository.createUser(dto);
-  }
   async getUserByTelegramId(id: number): Promise<User | null> {
     return this.usersRepository.getUserByTelegramId(id);
+  }
+
+  async createUserByTelegram(
+    @Body() dto: CreateUserByTelegramDto,
+  ): Promise<User> {
+    return this.usersRepository.createUserByTelegram(dto);
   }
 }

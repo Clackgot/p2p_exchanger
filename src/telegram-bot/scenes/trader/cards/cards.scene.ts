@@ -64,7 +64,11 @@ export class TraderCardsScene {
 
     const { id } = ctx.message?.from;
     const user = await this.usersService.getUserByTelegramId(id);
-    const cards = user!.bankCards.slice(0, 50);
+    if (!user) {
+      await ctx.reply('Не удалось найти пользователя');
+      return ctx.scene.leave();
+    }
+    const cards = user.bankCards.slice(0, 50);
     const buttons: InlineKeyboardButton[][] = cards.map<InlineKeyboardButton[]>(
       (card) => [
         {
@@ -117,9 +121,9 @@ export class TraderCardsScene {
 
     if (!match) {
       await ctx.reply('Не удалось получить номер карты');
-      await ctx.scene.leave();
+      return ctx.scene.leave();
     }
-    const cardNumber = match![1];
+    const cardNumber = match[1];
 
     const card = await this.cardsService.getCardById(cardNumber);
     const replyMessage = displayCardMessage(card);
@@ -143,9 +147,9 @@ export class TraderCardsScene {
 
     if (!match) {
       await ctx.reply('Не удалось получить номер карты');
-      await ctx.scene.leave();
+      return ctx.scene.leave();
     }
-    const cardNumber = match![1];
-    await ctx.answerCbQuery(`Удаляем карту`);
+    const cardNumber = match[1];
+    await ctx.answerCbQuery(`Удаляем карту ${cardNumber}`);
   }
 }

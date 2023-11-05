@@ -19,9 +19,7 @@ export class AppUpdate {
     if (!id) return ctx.reply('Не удалось найти пользователя');
     let user = await this.usersService.getUserByTelegramId(id);
     if (!user)
-      user = await this.usersService.createUser({
-        telegramUser: { id, username },
-      });
+      user = await this.usersService.createUserByTelegram({ id, username });
     ctx.scene.enter(getSceneByUserRole(user.role));
   }
 

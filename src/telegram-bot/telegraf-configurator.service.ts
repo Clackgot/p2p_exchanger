@@ -3,8 +3,7 @@ import { TelegrafModuleOptions, TelegrafOptionsFactory } from 'nestjs-telegraf';
 import applicationConstants from 'src/config/applicationConstants';
 
 import { UsersService } from 'src/users/users.service';
-import { Context, SessionStore, session } from 'telegraf';
-import { WizardContext } from 'telegraf/typings/scenes';
+import { SessionStore, session } from 'telegraf';
 import { Redis } from '@telegraf/session/redis';
 
 @Injectable()
@@ -17,18 +16,18 @@ export class TelegrafConfigurator implements TelegrafOptionsFactory {
 
   private setUserRoleMiddleware = async (ctx: any, next: any) => {
     try {
-      const id = ctx.message?.from?.id || ctx?.update?.callback_query?.from?.id;
+      const id =
+        ctx?.message?.from?.id || ctx?.update?.callback_query?.from?.id;
       const username =
-        ctx.message?.from?.username ||
+        ctx?.message?.from?.username ||
         ctx?.update?.callback_query?.from?.username;
+
       if (!id) throw new NotFoundException('Не удалось получить ID');
       let user = await this.usersService.getUserByTelegramId(id);
       if (!user) {
-        user = await this.usersService.createUser({
-          telegramUser: {
-            id,
-            username,
-          },
+        user = await this.usersService.createUserByTelegram({
+          id,
+          username,
         });
       }
       ctx.state.role = user.role;
