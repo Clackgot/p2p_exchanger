@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -12,7 +11,6 @@ import { Repository } from 'typeorm';
 import { GetCardsByUserIdDto } from './dto/get-cards-by-user-id.dto';
 import { CreateCardDto } from './dto/create-card.dto';
 import { RemoveCardDto } from './dto/remove-card.dto';
-import { RecoverCardDto } from './dto/recover-card.dto';
 
 @Injectable()
 export class CardsRepository {

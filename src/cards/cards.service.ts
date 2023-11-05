@@ -4,7 +4,6 @@ import { GetCardsByUserIdDto } from './dto/get-cards-by-user-id.dto';
 import { BankCard } from 'src/models/bank-card.model';
 import { CreateCardDto } from './dto/create-card.dto';
 import { RemoveCardDto } from './dto/remove-card.dto';
-import { RecoverCardDto } from './dto/recover-card.dto';
 
 @Injectable()
 export class CardsService {
