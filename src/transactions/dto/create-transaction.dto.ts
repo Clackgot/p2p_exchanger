@@ -1,10 +1,11 @@
-import { TransactionAmount } from 'src/models/transaction-amount.model';
 import { Transaction } from 'src/models/transaction.model';
+import { User } from 'src/models/user.model';
 
 export class CreateTransactionDto
-  implements Pick<Transaction, 'transferAmount'>
+  implements Pick<Transaction, 'sender' | 'recipient' | 'trx' | 'usdt'>
 {
-  senderId: string;
-  recipientId: string;
-  transferAmount: TransactionAmount;
+  sender: User;
+  recipient: User;
+  trx: number;
+  usdt: number;
 }

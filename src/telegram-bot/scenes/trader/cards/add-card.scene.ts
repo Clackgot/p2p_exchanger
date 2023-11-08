@@ -16,7 +16,7 @@ import {
 } from 'telegraf/typings/core/types/typegram';
 import { CardsService } from 'src/cards/cards.service';
 import { UserMessage } from 'src/telegram-bot/types/message.type';
-import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
+import { Logger, NotFoundException } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
 import { BankCard } from 'src/models/bank-card.model';
 import { displayCardMessage } from './utils/messages';

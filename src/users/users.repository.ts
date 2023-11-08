@@ -30,6 +30,14 @@ export class UsersRepository {
     });
   }
 
+  async getUserById(id: string): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: {
+        id,
+      },
+    });
+  }
+
   async createUserByTelegram(dto: CreateUserByTelegramDto): Promise<User> {
     const manager = this.usersRepository.manager;
     const { id, username } = dto;

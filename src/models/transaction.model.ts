@@ -2,16 +2,16 @@ import {
   Column,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './user.model';
-import { TransactionAmount } from './transaction-amount.model';
 
 export enum TransactionStatus {
-  Created = 'Создана',
-  Confirmed = 'Подтверждена',
-  Rejected = 'Отклонена',
+  Created = 'CREATED',
+  Confirmed = 'COBFIRMED',
+  Rejected = 'REJECTED',
 }
 
 @Entity({
@@ -21,17 +21,19 @@ export class Transaction {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => User)
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'sender' })
   sender: User;
 
-  @OneToOne(() => User)
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'recipient' })
   recipient: User;
 
-  @OneToOne(() => TransactionAmount)
-  @JoinColumn({ name: 'transfer_amount' })
-  transferAmount: TransactionAmount;
+  @Column({ name: 'usdt', nullable: false })
+  usdt: number;
+
+  @Column({ name: 'trx', nullable: false })
+  trx: number;
 
   @Column({
     name: 'status',

@@ -1,10 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Transaction } from 'src/models/transaction.model';
 import { Repository } from 'typeorm';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { User } from 'src/models/user.model';
-import { TransactionAmount } from 'src/models/transaction-amount.model';
 
 @Injectable()
 export class TransactionsRepository {
@@ -18,20 +17,12 @@ export class TransactionsRepository {
     return this.transactionsRepository.find();
   }
 
-  // TODO доделать и решить проблему с ошибкой Cannot perform update query because update values are not defined. Call "qb.set(...)" method to specify updated values
-  async createTransation(dto: CreateTransactionDto): Promise<any> {
-    const sender: User = await this.usersRepository.findOneOrFail({
-      where: { id: dto.senderId },
-    });
-    const recipient: User = await this.usersRepository.findOneOrFail({
-      where: { id: dto.recipientId },
-    });
-    const transactionAmount: TransactionAmount = dto.transferAmount;
+  async createTransation(dto: CreateTransactionDto): Promise<Transaction> {
     const transaction: Transaction = new Transaction();
-    transaction.recipient = recipient;
-    transaction.sender = sender;
-    transaction.transferAmount = transactionAmount;
+    transaction.recipient = dto.recipient;
+    transaction.sender = dto.sender;
+    transaction.trx = dto.trx;
+    transaction.usdt = dto.usdt;
     return this.transactionsRepository.save(transaction);
-    return null;
   }
 }

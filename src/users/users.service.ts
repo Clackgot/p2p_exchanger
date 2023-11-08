@@ -15,6 +15,10 @@ export class UsersService {
     return this.usersRepository.getUserByTelegramId(id);
   }
 
+  async getUserById(id: string): Promise<User | null> {
+    return this.usersRepository.getUserById(id);
+  }
+
   async createUserByTelegram(
     @Body() dto: CreateUserByTelegramDto,
   ): Promise<User> {
