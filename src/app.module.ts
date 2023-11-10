@@ -15,6 +15,7 @@ import { BalancesModule } from './balances/balances.module';
 import { CardsModule } from './cards/cards.module';
 import { UsersModule } from './users/users.module';
 import { TronObserverModule } from './tron-observer/tron-observer.module';
+import { TronModule } from './tron/tron.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { TronObserverModule } from './tron-observer/tron-observer.module';
     CardsModule,
     UsersModule,
     TronObserverModule,
+    TronModule,
   ],
   controllers: [AppController],
   providers: [AppService],

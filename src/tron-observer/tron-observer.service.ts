@@ -11,12 +11,12 @@ export class TronObserverService {
     private readonly usersService: UsersService,
     private readonly trongridService: TrongridService,
   ) {}
-  @Cron(CronExpression.EVERY_5_SECONDS)
+  // @Cron(CronExpression.EVERY_5_SECONDS)
   async observeTronBalances() {
     const users = await this.usersService.getAllUsers();
     const accounts = users.map((u) => u.tronAccount.address);
     const promises = accounts.map((a) =>
-      this.trongridService.getAddressInfo(a),
+      this.trongridService.getTronAccountInfoByAddress(a),
     );
     const balances = await Promise.all(promises);
     console.log(balances);

@@ -26,7 +26,7 @@ export class TrongridModule {
   constructor(private readonly trongridService: TrongridService) {}
 
   async onModuleInit(): Promise<void> {
-    const addressInfo = await this.trongridService.getAddressInfo(
+    const addressInfo = await this.trongridService.getTronAccountInfoByAddress(
       applicationConstants.STORAGE.ADDRESS,
     );
 

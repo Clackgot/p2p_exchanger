@@ -50,7 +50,7 @@ export class UsersRepository {
     return manager.transaction(async (entityManager: EntityManager) => {
       try {
         const tronAccount: TronAccount =
-          (await this.tronwebService.generateAddress()) as TronAccount;
+          (await this.tronwebService.generateTronAccount()) as TronAccount;
 
         const user = new User();
 

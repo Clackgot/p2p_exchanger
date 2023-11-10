@@ -1,13 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({
   name: 'tron_accounts',
 })
 export class TronAccount {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @Column({ name: 'address', nullable: false })
+  @PrimaryColumn({ name: 'address', nullable: false, unique: true })
   address: string;
 
   @Column({ name: 'private_key', nullable: false })
