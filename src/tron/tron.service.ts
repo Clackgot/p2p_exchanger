@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { Transaction } from 'src/models/transaction.model';
 import { TronAccount } from 'src/models/tron-account.model';
 import { ITrongridService } from 'src/providers/trongrid/interfaces';
 import { TrongridService } from 'src/providers/trongrid/trongrid.service';
 import { TronAccountInfo } from 'src/providers/trongrid/types';
+import { SendUsdtDto } from 'src/providers/tronweb/dto/send-usdt.dto';
 import { ITronwebService } from 'src/providers/tronweb/interfaces';
 import { TronwebService } from 'src/providers/tronweb/tronweb.service';
 
@@ -14,6 +16,9 @@ export class TronService implements ITronService {
     private readonly tronwebService: TronwebService,
     private readonly trongridService: TrongridService,
   ) {}
+  async sendUsdt(dto: SendUsdtDto): Promise<Transaction> {
+    return this.tronwebService.sendUsdt(dto);
+  }
 
   async getTronAccountFromMnemonic(seedPhrase: string): Promise<TronAccount> {
     return this.tronwebService.getTronAccountFromMnemonic(seedPhrase);

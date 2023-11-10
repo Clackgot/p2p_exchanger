@@ -22,12 +22,12 @@ export class Transaction {
   id: string;
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'sender' })
-  sender: User;
+  @JoinColumn({ name: 'from' })
+  from: User;
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'recipient' })
-  recipient: User;
+  @JoinColumn({ name: 'to' })
+  to: User;
 
   @Column({ name: 'usdt', nullable: false })
   usdt: number;

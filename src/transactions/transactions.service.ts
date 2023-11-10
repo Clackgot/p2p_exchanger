@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { TransactionsRepository } from './transactions.repository';
 import { Transaction } from 'src/models/transaction.model';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
@@ -25,13 +20,13 @@ export class TransactionsService {
   }
 
   async createTransation(dto: CreateTransactionDto): Promise<Transaction> {
-    const sender = await this.usersService.getUserById(dto.sender.id);
-    const recipient = await this.usersService.getUserById(dto.recipient.id);
-    if (!sender) throw new UserNotFoundException(dto?.sender?.id);
+    const fromUser = await this.usersService.getUserById(dto.from.id);
+    const toUser = await this.usersService.getUserById(dto.to.id);
+    if (!fromUser) throw new UserNotFoundException(dto?.from?.id);
 
-    if (!recipient) throw new UserNotFoundException(dto?.recipient?.id);
-    dto.sender = sender;
-    dto.recipient = sender;
+    if (!toUser) throw new UserNotFoundException(dto?.to?.id);
+    dto.from = fromUser;
+    dto.to = fromUser;
     try {
       return this.transactionsRepository.createTransation(dto);
     } catch (error) {

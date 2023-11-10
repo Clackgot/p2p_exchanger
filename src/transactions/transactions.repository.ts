@@ -19,8 +19,8 @@ export class TransactionsRepository {
 
   async createTransation(dto: CreateTransactionDto): Promise<Transaction> {
     const transaction: Transaction = new Transaction();
-    transaction.recipient = dto.recipient;
-    transaction.sender = dto.sender;
+    transaction.from = dto.from;
+    transaction.to = dto.to;
     transaction.trx = dto.trx;
     transaction.usdt = dto.usdt;
     return this.transactionsRepository.save(transaction);
