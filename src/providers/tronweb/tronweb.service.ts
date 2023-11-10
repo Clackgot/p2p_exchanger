@@ -1,4 +1,4 @@
-import { Injectable, Logger, Scope } from '@nestjs/common';
+import { Inject, Injectable, Logger, Scope } from '@nestjs/common';
 import applicationConstants from 'src/config/applicationConstants';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -11,7 +11,6 @@ import { TronWebBadwidthError } from './errors/badwidth.error';
 import { TronWebErrorCode } from './enums/error-code.enum';
 import { TronWebError } from './errors/base.error';
 
-@Injectable({ scope: Scope.REQUEST })
 export class TronwebService implements ITronwebService {
   private readonly logger = new Logger(this.constructor.name);
 

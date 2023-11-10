@@ -6,6 +6,7 @@ import { CreateMerchantDto } from './dto/create-merchant.dto';
 import { TronAccount } from 'src/models/tron-account.model';
 import { TronwebService } from 'src/providers/tronweb/tronweb.service';
 import { Balance } from 'src/models/balance.model';
+import { TronService } from 'src/tron/tron.service';
 
 @Injectable()
 export class MerchantsRepository {
@@ -13,7 +14,7 @@ export class MerchantsRepository {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
-    private readonly tronwebService: TronwebService,
+    private readonly tronService: TronService,
   ) {}
 
   async getMerchants(): Promise<User[]> {
@@ -34,7 +35,7 @@ export class MerchantsRepository {
     return manager.transaction(async (entityManager: EntityManager) => {
       try {
         const tronAccount: TronAccount =
-          (await this.tronwebService.generateTronAccount()) as TronAccount;
+          (await this.tronService.generateTronAccount()) as TronAccount;
 
         const user = new User();
 

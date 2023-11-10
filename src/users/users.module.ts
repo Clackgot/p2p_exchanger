@@ -6,11 +6,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/models/user.model';
 import { TronwebModule } from 'src/providers/tronweb/tronweb.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { TronModule } from 'src/tron/tron.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
-    TronwebModule,
+    TronModule,
     ScheduleModule.forRoot(),
   ],
   providers: [UsersService, UsersRepository],
