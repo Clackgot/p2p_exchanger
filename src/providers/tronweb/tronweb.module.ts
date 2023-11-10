@@ -27,12 +27,14 @@ export class TronwebModule {
           },
         });
       },
+      scope: Scope.TRANSIENT,
     };
 
     const tronwebServiceProvider: Provider = {
       provide: TronwebService,
       useFactory: (tronWeb: TronWeb) => new TronwebService(tronWeb),
       inject: [TronWeb],
+      scope: Scope.REQUEST,
     };
 
     return {
