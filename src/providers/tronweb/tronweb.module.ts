@@ -33,14 +33,13 @@ export class TronwebModule {
     const tronwebServiceProvider: Provider = {
       provide: TronwebService,
       useFactory: (tronWeb: TronWeb) => new TronwebService(tronWeb),
-      inject: [TronWeb],
-      scope: Scope.REQUEST,
+      scope: Scope.TRANSIENT,
     };
 
     return {
       module: TronwebModule,
       providers: [tronWebProvider, tronwebServiceProvider],
-      exports: [TronwebService],
+      exports: [tronwebServiceProvider],
     };
   }
 }

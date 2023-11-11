@@ -12,6 +12,7 @@ import { TronWebErrorCode } from './enums/error-code.enum';
 import { TronWebError } from './errors/base.error';
 import * as bs58 from 'bs58';
 
+@Injectable()
 export class TronwebService implements ITronwebService {
   private readonly logger = new Logger(this.constructor.name);
 
