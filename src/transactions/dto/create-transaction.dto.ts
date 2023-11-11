@@ -1,11 +1,11 @@
 import { Transaction } from 'src/models/transaction.model';
-import { User } from 'src/models/user.model';
+import { TronAccount } from 'src/models/tron-account.model';
 
 export class CreateTransactionDto
   implements Pick<Transaction, 'from' | 'to' | 'trx' | 'usdt'>
 {
-  from: User;
-  to: User;
+  from: TronAccount;
+  to: TronAccount;
   trx: number;
   usdt: number;
 }

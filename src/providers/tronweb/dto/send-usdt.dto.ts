@@ -3,7 +3,7 @@ import { TronAccount } from 'src/models/tron-account.model';
 import { User } from 'src/models/user.model';
 
 export class SendUsdtDto implements Pick<Transaction, 'usdt'> {
-  from: User;
-  to: User;
+  from: TronAccount;
+  to: TronAccount;
   usdt: number;
 }

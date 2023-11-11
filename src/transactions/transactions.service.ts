@@ -2,17 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { TransactionsRepository } from './transactions.repository';
 import { Transaction } from 'src/models/transaction.model';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { UsersService } from 'src/users/users.service';
-import {
-  TransactionException,
-  UserNotFoundException,
-} from './errors/user-not-found.exception';
+import { TronAccountsService } from 'src/tron-accounts/tron-accounts.service';
+import { TransactionException } from './errors/base/transaction.exception';
 
 @Injectable()
 export class TransactionsService {
   constructor(
     private readonly transactionsRepository: TransactionsRepository,
-    private readonly usersService: UsersService,
+    private readonly tronAccountsService: TronAccountsService,
   ) {}
 
   async getTransations(): Promise<Transaction[]> {
@@ -20,13 +17,11 @@ export class TransactionsService {
   }
 
   async createTransation(dto: CreateTransactionDto): Promise<Transaction> {
-    const fromUser = await this.usersService.getUserById(dto.from.id);
-    const toUser = await this.usersService.getUserById(dto.to.id);
-    if (!fromUser) throw new UserNotFoundException(dto?.from?.id);
+    const from = await this.tronAccountsService.getByAddress(dto.from.address);
+    const to = await this.tronAccountsService.getByAddress(dto.to.address);
 
-    if (!toUser) throw new UserNotFoundException(dto?.to?.id);
-    dto.from = fromUser;
-    dto.to = fromUser;
+    dto.from = from;
+    dto.to = to;
     try {
       return this.transactionsRepository.createTransation(dto);
     } catch (error) {

@@ -6,9 +6,14 @@ import { Transaction } from 'src/models/transaction.model';
 import { TransactionsRepository } from './transactions.repository';
 import { User } from 'src/models/user.model';
 import { UsersModule } from 'src/users/users.module';
+import { TronAccountsModule } from 'src/tron-accounts/tron-accounts.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Transaction, User]), UsersModule],
+  imports: [
+    TypeOrmModule.forFeature([Transaction, User]),
+    UsersModule,
+    TronAccountsModule,
+  ],
   providers: [TransactionsService, TransactionsRepository],
   controllers: [TransactionsController],
 })

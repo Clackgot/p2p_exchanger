@@ -15,6 +15,7 @@ export class TronwebService implements ITronwebService {
   private readonly logger = new Logger(this.constructor.name);
 
   constructor(private readonly tronWeb: TronWeb) {}
+
   async sendUsdt(dto: SendUsdtDto): Promise<Transaction> {
     const { from, to, usdt } = dto;
     try {
@@ -22,7 +23,7 @@ export class TronwebService implements ITronwebService {
         .contract()
         .at(applicationConstants.TETHER_USDT_TOKEN_ADDRESS);
       const signedTransaction = await contract.transfer(
-        from.tronAccount.address,
+        from.address,
         usdt * 1_000_000,
       );
 

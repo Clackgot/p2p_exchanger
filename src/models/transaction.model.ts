@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './user.model';
+import { TronAccount } from './tron-account.model';
 
 export enum TransactionStatus {
   Created = 'CREATED',
@@ -21,13 +22,13 @@ export class Transaction {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => TronAccount)
   @JoinColumn({ name: 'from' })
-  from: User;
+  from: TronAccount;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => TronAccount)
   @JoinColumn({ name: 'to' })
-  to: User;
+  to: TronAccount;
 
   @Column({ name: 'usdt', nullable: false })
   usdt: number;

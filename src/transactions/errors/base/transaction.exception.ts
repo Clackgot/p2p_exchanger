@@ -11,9 +11,3 @@ export class TransactionException extends HttpException {
     );
   }
 }
-
-export class UserNotFoundException extends TransactionException {
-  constructor(userId: string) {
-    super(`Пользователь с ID ${userId} не найден`, HttpStatus.NOT_FOUND);
-  }
-}
