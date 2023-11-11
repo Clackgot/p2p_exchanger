@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { TronAccountInfo } from 'src/providers/trongrid/types';
 import { TronService } from 'src/tron/tron.service';
 import { UsersService } from 'src/users/users.service';
@@ -12,7 +13,7 @@ export class TronObserverService {
     private readonly usersService: UsersService,
     private readonly tronService: TronService,
   ) {}
-  // @Cron(CronExpression.EVERY_5_SECONDS)
+  @Cron(CronExpression.EVERY_5_SECONDS)
   async observeTronBalances() {
     const users = await this.usersService.getAllUsers();
     const userBalanceList: Promise<UserBalanceInfo>[] = users.map(async (u) => {

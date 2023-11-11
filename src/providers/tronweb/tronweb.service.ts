@@ -11,6 +11,8 @@ import { TronWebBadwidthError } from './errors/badwidth.error';
 import { TronWebErrorCode } from './enums/error-code.enum';
 import { TronWebError } from './errors/base.error';
 import * as bs58 from 'bs58';
+import { SendTrxDto } from './dto/send-trx.dto';
+import { TronWebContractValidateError } from './errors/contract-validate.error';
 
 @Injectable()
 export class TronwebService implements ITronwebService {
@@ -18,25 +20,53 @@ export class TronwebService implements ITronwebService {
 
   constructor(private readonly tronWeb: TronWeb) {}
 
+  async getAccountInfo(address: string): Promise<any> {
+    const result = await this.tronWeb.trx.getUnconfirmedBalance(address);
+    console.log(result);
+    return result;
+  }
+
+  async sendTrx(dto: SendTrxDto): Promise<string> {
+    this.tronWeb.setAddress(dto.from.address);
+    this.tronWeb.setPrivateKey(dto.from.privateKey);
+    const transaction = await this.tronWeb.trx.sendTransaction(
+      dto.to.address,
+      dto.trx * 1_000_000,
+    );
+
+    if (transaction?.result && transaction?.txid) {
+      return transaction.txid;
+    }
+
+    switch (transaction?.code) {
+      case TronWebErrorCode.BANDWITH_ERROR:
+        throw new TronWebBadwidthError('Не хватает пропускной способности');
+      case TronWebErrorCode.CONTRACT_VALIDATE_ERROR:
+        throw new TronWebContractValidateError(
+          'Не удалось подтвердить транзакцию',
+        );
+      default:
+        throw new TronWebError('Неизвестная ошибка');
+    }
+  }
+
   async sendUsdt(dto: SendUsdtDto): Promise<Transaction> {
-    const { from, to, usdt } = dto;
+    this.tronWeb.setAddress(dto.from.address);
+    this.tronWeb.setPrivateKey(dto.from.privateKey);
+    const { to, usdt } = dto;
     try {
       const contract = await this.tronWeb
         .contract()
         .at(applicationConstants.TETHER_USDT_TOKEN_ADDRESS);
       const signedTransaction = await contract.transfer(
-        from.address,
+        to.address,
         usdt * 1_000_000,
       );
 
-      const transaction: boolean = await signedTransaction.send({
-        shouldPollResponse: true,
+      const transactionId = await signedTransaction.send({
+        shouldPollResponse: false,
       });
-      const data: Pick<Transaction, 'id' | 'status'> = {
-        id: Math.random().toString(),
-        status: TransactionStatus.Created,
-      };
-      return { ...dto, ...data, trx: 0 };
+      return transactionId;
     } catch (err) {
       switch (err?.error) {
         case TronWebErrorCode.BANDWITH_ERROR:
