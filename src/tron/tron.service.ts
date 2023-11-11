@@ -16,6 +16,12 @@ export class TronService implements ITronService {
     private readonly tronwebService: TronwebService,
     private readonly trongridService: TrongridService,
   ) {}
+  base58ToHex(base58: string): string {
+    return this.tronwebService.base58ToHex(base58);
+  }
+  hexToBase58(hex: string): string {
+    return this.tronwebService.hexToBase58(hex);
+  }
   async sendUsdt(dto: SendUsdtDto): Promise<Transaction> {
     return this.tronwebService.sendUsdt(dto);
   }

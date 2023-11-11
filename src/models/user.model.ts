@@ -39,7 +39,7 @@ export class User {
   @OneToOne(() => TronAccount, {
     nullable: false,
     eager: true,
-    cascade: ['insert', 'update', 'soft-remove', 'recover'],
+    cascade: ['insert', 'update', 'soft-remove', 'recover', 'remove'],
   })
   @JoinColumn({ name: 'tron_account' })
   tronAccount: TronAccount;

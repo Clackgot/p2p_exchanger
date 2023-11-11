@@ -3,19 +3,22 @@ import { TronAccountsRepository } from './tron-accounts.repository';
 import { TronAccount } from 'src/models/tron-account.model';
 import { CreateTronAccountDto } from './dto/create-tron-account.dto';
 import { UpdateTronAccountDto } from './dto/update-tron-account.dto';
+import { TronService } from 'src/tron/tron.service';
 
 @Injectable()
 export class TronAccountsService {
   constructor(
     private readonly tronAccountsRepository: TronAccountsRepository,
+    private readonly tronService: TronService,
   ) {}
 
   async getAll(): Promise<TronAccount[]> {
     return this.tronAccountsRepository.getAll();
   }
 
-  async createTronAccount(dto: CreateTronAccountDto): Promise<TronAccount> {
-    return this.tronAccountsRepository.createTronAccount(dto);
+  async generateTronAccount(): Promise<TronAccount> {
+    const account = await this.tronService.generateTronAccount();
+    return this.tronAccountsRepository.createTronAccount(account);
   }
 
   async getByAddress(address: string): Promise<TronAccount> {
@@ -30,9 +33,5 @@ export class TronAccountsService {
       address,
       updateTronAccountDto,
     );
-  }
-
-  async removeAccount(address: string): Promise<TronAccount> {
-    return this.tronAccountsRepository.removeAccount(address);
   }
 }

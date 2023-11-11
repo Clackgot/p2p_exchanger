@@ -6,4 +6,6 @@ export interface ITronwebService {
   getTronAccountFromMnemonic(seedPhrase: string): Promise<TronAccount>;
   generateTronAccount(): Promise<TronAccount>;
   sendUsdt(dto: SendUsdtDto): Promise<Transaction>;
+  hexToBase58(hex: string): string;
+  base58ToHex(base58: string): string;
 }

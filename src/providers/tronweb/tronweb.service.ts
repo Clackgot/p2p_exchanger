@@ -10,6 +10,7 @@ import { SendUsdtDto } from './dto/send-usdt.dto';
 import { TronWebBadwidthError } from './errors/badwidth.error';
 import { TronWebErrorCode } from './enums/error-code.enum';
 import { TronWebError } from './errors/base.error';
+import * as bs58 from 'bs58';
 
 export class TronwebService implements ITronwebService {
   private readonly logger = new Logger(this.constructor.name);
@@ -70,5 +71,16 @@ export class TronwebService implements ITronwebService {
       publicKey,
       seedPhrase,
     };
+  }
+
+  hexToBase58(hex: string): string {
+    const buffer = Buffer.from(hex, 'hex');
+    return bs58.encode(buffer);
+  }
+
+  base58ToHex(base58: string): string {
+    const bytes = bs58.decode(base58);
+    const hex = Buffer.from(bytes).toString('hex').toUpperCase();
+    return hex;
   }
 }

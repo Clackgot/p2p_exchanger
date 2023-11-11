@@ -22,10 +22,8 @@ export class TronAccountsController {
   }
 
   @Post()
-  async createTronAccount(
-    @Body() dto: CreateTronAccountDto,
-  ): Promise<TronAccount> {
-    return this.tronAccountsService.createTronAccount(dto);
+  async generateTronAccount(): Promise<TronAccount> {
+    return this.tronAccountsService.generateTronAccount();
   }
 
   @Get('/:address')
@@ -42,10 +40,5 @@ export class TronAccountsController {
       address,
       updateTronAccountDto,
     );
-  }
-
-  @Delete('/:address')
-  async removeAccount(@Param('address') address: string): Promise<TronAccount> {
-    return this.tronAccountsService.removeAccount(address);
   }
 }

@@ -20,7 +20,7 @@ export class TronAccountsRepository {
 
   async createTronAccount(dto: CreateTronAccountDto): Promise<TronAccount> {
     const account = await this.tronAccountsRepository.findOne({ where: dto });
-    if (!account) throw new TronAccountAlreadyExistsException(dto.address);
+    if (account) throw new TronAccountAlreadyExistsException(dto.address);
     return this.tronAccountsRepository.save(dto);
   }
 
@@ -51,20 +51,5 @@ export class TronAccountsRepository {
 
     // Сохраняем изменения
     return this.tronAccountsRepository.save(account);
-  }
-
-  async removeAccount(address: string): Promise<TronAccount> {
-    const account = await this.tronAccountsRepository.findOne({
-      where: {
-        address,
-      },
-    });
-    if (!account) throw new TronAccountNotFoundException(address);
-
-    // Удаляем аккаунт
-    await this.tronAccountsRepository.remove(account);
-
-    // Возвращаем удаленный аккаунт
-    return account;
   }
 }
