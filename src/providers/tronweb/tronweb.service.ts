@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger, Scope } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import applicationConstants from 'src/config/applicationConstants';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore

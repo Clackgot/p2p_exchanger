@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { TrongridService } from './trongrid.service';
 import { TronAccountInfo } from './types';
 

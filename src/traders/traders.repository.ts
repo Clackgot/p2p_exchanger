@@ -4,7 +4,6 @@ import { User, UserRole } from 'src/models/user.model';
 import { EntityManager, Repository } from 'typeorm';
 import { CreateTraderDto } from './dto/create-trader.dto';
 import { TronAccount } from 'src/models/tron-account.model';
-import { TronwebService } from 'src/providers/tronweb/tronweb.service';
 import { Balance } from 'src/models/balance.model';
 import { TronService } from 'src/tron/tron.service';
 

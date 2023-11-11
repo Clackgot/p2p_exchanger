@@ -4,7 +4,6 @@ import { User } from 'src/models/user.model';
 import { EntityManager, Repository } from 'typeorm';
 import { Balance } from 'src/models/balance.model';
 import { TronAccount } from 'src/models/tron-account.model';
-import { TronwebService } from 'src/providers/tronweb/tronweb.service';
 import { CreateUserByTelegramDto } from './dto/create-user-by-telegram.dto';
 import { TelegramUser } from 'src/models/telegram-user.model';
 import { TronService } from 'src/tron/tron.service';

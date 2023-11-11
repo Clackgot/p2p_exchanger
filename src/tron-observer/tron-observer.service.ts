@@ -1,7 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { UserRole } from 'src/models/user.model';
-import { TrongridService } from 'src/providers/trongrid/trongrid.service';
 import { TronAccountInfo } from 'src/providers/trongrid/types';
 import { TronService } from 'src/tron/tron.service';
 import { UsersService } from 'src/users/users.service';

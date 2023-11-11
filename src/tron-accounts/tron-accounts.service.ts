@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { TronAccountsRepository } from './tron-accounts.repository';
 import { TronAccount } from 'src/models/tron-account.model';
-import { CreateTronAccountDto } from './dto/create-tron-account.dto';
 import { UpdateTronAccountDto } from './dto/update-tron-account.dto';
 import { TronService } from 'src/tron/tron.service';
 

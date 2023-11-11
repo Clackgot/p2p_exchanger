@@ -1,15 +1,6 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { TronAccountsService } from './tron-accounts.service';
 import { TronAccount } from 'src/models/tron-account.model';
-import { CreateTronAccountDto } from './dto/create-tron-account.dto';
 import { UpdateTronAccountDto } from './dto/update-tron-account.dto';
 
 @Controller('tron-accounts')

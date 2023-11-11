@@ -3,10 +3,8 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from './user.model';
 import { TronAccount } from './tron-account.model';
 
 export enum TransactionStatus {
