@@ -48,8 +48,8 @@ export class TronwebService implements ITronwebService {
     }
   }
 
-  async getTronAccountFromMnemonic(seedPhrase: string): Promise<TronAccount> {
-    const result = await this.tronWeb.fromMnemonic(seedPhrase);
+  getTronAccountFromMnemonic(seedPhrase: string): Omit<TronAccount, 'id'> {
+    const result = this.tronWeb.fromMnemonic(seedPhrase);
     const { address, privateKey, publicKey } = result;
     return {
       address,
@@ -59,8 +59,8 @@ export class TronwebService implements ITronwebService {
     };
   }
 
-  async generateTronAccount(): Promise<TronAccount> {
-    const result = await this.tronWeb.createRandom();
+  generateTronAccount(): Omit<TronAccount, 'id'> {
+    const result = this.tronWeb.createRandom();
     let { privateKey, publicKey } = result;
     privateKey = privateKey?.replace('0x', '');
     publicKey = publicKey?.replace('0x', '');

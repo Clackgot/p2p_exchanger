@@ -6,7 +6,7 @@ import { TronService } from './tron.service';
 export class TronController {
   constructor(private readonly tronService: TronService) {}
   @Get()
-  async generateTronAccount(): Promise<TronAccount> {
+  generateTronAccount(): Omit<TronAccount, 'id'> {
     return this.tronService.generateTronAccount();
   }
   @Get('hex-to-base58/:hex')

@@ -4,7 +4,10 @@ import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
   name: 'tron_accounts',
 })
 export class TronAccount {
-  @PrimaryColumn({ name: 'address', nullable: false, unique: true })
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ name: 'address', nullable: false, unique: true })
   address: string;
 
   @Column({ name: 'private_key', nullable: false })

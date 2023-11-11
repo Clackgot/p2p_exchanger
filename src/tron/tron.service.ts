@@ -26,14 +26,14 @@ export class TronService implements ITronService {
     return this.tronwebService.sendUsdt(dto);
   }
 
-  async getTronAccountFromMnemonic(seedPhrase: string): Promise<TronAccount> {
+  getTronAccountFromMnemonic(seedPhrase: string): Omit<TronAccount, 'id'> {
     return this.tronwebService.getTronAccountFromMnemonic(seedPhrase);
   }
-  async generateTronAccount(): Promise<TronAccount> {
+  generateTronAccount(): Omit<TronAccount, 'id'> {
     return this.tronwebService.generateTronAccount();
   }
 
-  async fromMnemonic(seedPhrase: string): Promise<TronAccount> {
+  fromMnemonic(seedPhrase: string): Omit<TronAccount, 'id'> {
     return this.tronwebService.getTronAccountFromMnemonic(seedPhrase);
   }
   async getTronAccountInfoByAddress(address: string): Promise<TronAccountInfo> {

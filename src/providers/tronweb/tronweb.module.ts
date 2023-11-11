@@ -34,6 +34,7 @@ export class TronwebModule {
       provide: TronwebService,
       useFactory: (tronWeb: TronWeb) => new TronwebService(tronWeb),
       scope: Scope.TRANSIENT,
+      inject: [TronWeb],
     };
 
     return {
