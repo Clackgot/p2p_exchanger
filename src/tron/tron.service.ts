@@ -8,6 +8,7 @@ import { SendTrxDto } from 'src/providers/tronweb/dto/send-trx.dto';
 import { SendUsdtDto } from 'src/providers/tronweb/dto/send-usdt.dto';
 import { ITronwebService } from 'src/providers/tronweb/interfaces';
 import { TronwebService } from 'src/providers/tronweb/tronweb.service';
+import { CreateTronAccountDto } from 'src/tron-accounts/dto/create-tron-account.dto';
 
 interface ITronService extends ITronwebService, ITrongridService {}
 
@@ -17,6 +18,9 @@ export class TronService implements ITronService {
     private readonly tronwebService: TronwebService,
     private readonly trongridService: TrongridService,
   ) {}
+  async isAccountActivate(account: TronAccount): Promise<boolean> {
+    return this.tronwebService.isAccountActivate(account);
+  }
 
   base58ToHex(base58: string): string {
     return this.tronwebService.base58ToHex(base58);
@@ -32,14 +36,14 @@ export class TronService implements ITronService {
     return this.tronwebService.sendTrx(dto);
   }
 
-  getTronAccountFromMnemonic(seedPhrase: string): Omit<TronAccount, 'id'> {
+  getTronAccountFromMnemonic(seedPhrase: string): CreateTronAccountDto {
     return this.tronwebService.getTronAccountFromMnemonic(seedPhrase);
   }
-  generateTronAccount(): Omit<TronAccount, 'id'> {
+  generateTronAccount(): CreateTronAccountDto {
     return this.tronwebService.generateTronAccount();
   }
 
-  fromMnemonic(seedPhrase: string): Omit<TronAccount, 'id'> {
+  fromMnemonic(seedPhrase: string): CreateTronAccountDto {
     return this.tronwebService.getTronAccountFromMnemonic(seedPhrase);
   }
   async getTronAccountInfoByAddress(address: string): Promise<TronAccountInfo> {

@@ -13,6 +13,7 @@ import { TronWebError } from './errors/base.error';
 import * as bs58 from 'bs58';
 import { SendTrxDto } from './dto/send-trx.dto';
 import { TronWebContractValidateError } from './errors/contract-validate.error';
+import { CreateTronAccountDto } from 'src/tron-accounts/dto/create-tron-account.dto';
 
 @Injectable()
 export class TronwebService implements ITronwebService {
@@ -78,7 +79,7 @@ export class TronwebService implements ITronwebService {
     }
   }
 
-  getTronAccountFromMnemonic(seedPhrase: string): Omit<TronAccount, 'id'> {
+  getTronAccountFromMnemonic(seedPhrase: string): CreateTronAccountDto {
     const result = this.tronWeb.fromMnemonic(seedPhrase);
     const { address, privateKey, publicKey } = result;
     return {
@@ -89,7 +90,7 @@ export class TronwebService implements ITronwebService {
     };
   }
 
-  generateTronAccount(): Omit<TronAccount, 'id'> {
+  generateTronAccount(): CreateTronAccountDto {
     const result = this.tronWeb.createRandom();
     let { privateKey, publicKey } = result;
     privateKey = privateKey?.replace('0x', '');
@@ -113,5 +114,17 @@ export class TronwebService implements ITronwebService {
     const bytes = bs58.decode(base58);
     const hex = Buffer.from(bytes).toString('hex').toUpperCase();
     return hex;
+  }
+
+  async isAccountActivate(account: TronAccount): Promise<boolean> {
+    try {
+      const accountInfo = await this.tronWeb.trx.getAccount(account.address);
+      return Promise.resolve(Object.keys(accountInfo).length > 0);
+    } catch (error) {
+      this.logger.warn(
+        `Не удалось проверить активность аккаунта ${account?.address}`,
+      );
+      return false;
+    }
   }
 }

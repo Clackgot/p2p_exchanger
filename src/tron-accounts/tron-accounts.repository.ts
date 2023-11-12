@@ -52,4 +52,58 @@ export class TronAccountsRepository {
     // Сохраняем изменения
     return this.tronAccountsRepository.save(account);
   }
+
+  async updateTetherAvailability(
+    address: string,
+    isTetherAvailable: boolean,
+  ): Promise<TronAccount> {
+    const account = await this.tronAccountsRepository.findOne({
+      where: {
+        address,
+      },
+    });
+    if (!account) throw new TronAccountNotFoundException(address);
+
+    // Обновляем параметр
+    account.isTetherAvailable = isTetherAvailable;
+
+    // Сохраняем изменения
+    return this.tronAccountsRepository.save(account);
+  }
+
+  async updateTrxAvailability(
+    address: string,
+    isEnoughTrx: boolean,
+  ): Promise<TronAccount> {
+    const account = await this.tronAccountsRepository.findOne({
+      where: {
+        address,
+      },
+    });
+    if (!account) throw new TronAccountNotFoundException(address);
+
+    // Обновляем параметр
+    account.isEnoughTrx = isEnoughTrx;
+
+    // Сохраняем изменения
+    return this.tronAccountsRepository.save(account);
+  }
+
+  async updateActivationStatus(
+    address: string,
+    isActivated: boolean,
+  ): Promise<TronAccount> {
+    const account = await this.tronAccountsRepository.findOne({
+      where: {
+        address,
+      },
+    });
+    if (!account) throw new TronAccountNotFoundException(address);
+
+    // Обновляем параметр
+    account.isActivated = isActivated;
+
+    // Сохраняем изменения
+    return this.tronAccountsRepository.save(account);
+  }
 }

@@ -4,12 +4,13 @@ import { TronService } from './tron.service';
 import { SendUsdtDto } from 'src/providers/tronweb/dto/send-usdt.dto';
 import { Transaction } from 'src/models/transaction.model';
 import { SendTrxDto } from 'src/providers/tronweb/dto/send-trx.dto';
+import { CreateTronAccountDto } from 'src/tron-accounts/dto/create-tron-account.dto';
 
 @Controller('tron')
 export class TronController {
   constructor(private readonly tronService: TronService) {}
   @Get()
-  generateTronAccount(): Omit<TronAccount, 'id'> {
+  generateTronAccount(): CreateTronAccountDto {
     return this.tronService.generateTronAccount();
   }
   @Get('hex-to-base58/:hex')
