@@ -15,7 +15,7 @@ export class TronObserverService {
     private readonly tronService: TronService,
     private readonly tronAccountsService: TronAccountsService,
   ) {
-    this.checkAccountsActivation();
+    this.updateActivationStatus();
   }
   // @Cron(CronExpression.EVERY_5_SECONDS)
   async getTronBalances() {
@@ -37,7 +37,7 @@ export class TronObserverService {
   }
 
   @Cron(CronExpression.EVERY_10_SECONDS)
-  async checkAccountsActivation() {
+  async updateActivationStatus() {
     const users = await this.usersService.getAllUsers();
     for (const user of users) {
       const isActive = await this.tronService.isAccountActivate(

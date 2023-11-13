@@ -13,6 +13,13 @@ export enum TransactionStatus {
   Rejected = 'REJECTED',
 }
 
+export enum TransactionObjective {
+  ActivateAccount = 'ACTIVATE_ACCOUNT',
+  WithdrawUsdt = 'WITHDRAW_USDT',
+  ReplenishingTrx = 'REPLENISHING',
+  None = 'NONE',
+}
+
 @Entity({
   name: 'transactions',
 })
@@ -40,4 +47,11 @@ export class Transaction {
     default: TransactionStatus.Created,
   })
   status: TransactionStatus;
+
+  @Column({
+    name: 'objective',
+    enum: TransactionObjective,
+    default: TransactionObjective.None,
+  })
+  objective: TransactionStatus;
 }
