@@ -5,7 +5,7 @@ import applicationConstants from 'src/config/applicationConstants';
 import * as TronWeb from 'tronweb';
 import { TronAccount } from 'src/models/tron-account.model';
 import { ITronwebService } from './interfaces';
-import { Transaction, TransactionStatus } from 'src/models/transaction.model';
+import { Transaction } from 'src/models/transaction.model';
 import { SendUsdtDto } from './dto/send-usdt.dto';
 import { TronWebBadwidthError } from './errors/badwidth.error';
 import { TronWebErrorCode } from './enums/error-code.enum';
@@ -20,6 +20,12 @@ export class TronwebService implements ITronwebService {
   private readonly logger = new Logger(this.constructor.name);
 
   constructor(private readonly tronWeb: TronWeb) {}
+  getTransaction(transactionId: string): Promise<any> {
+    return this.tronWeb.trx.getTransaction(transactionId);
+  }
+  getTransactionInfo(transactionId: string): Promise<any> {
+    return this.tronWeb.trx.getTransactionInfo(transactionId);
+  }
 
   async getAccountInfo(address: string): Promise<any> {
     const result = await this.tronWeb.trx.getUnconfirmedBalance(address);

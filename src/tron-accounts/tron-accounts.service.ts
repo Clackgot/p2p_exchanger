@@ -34,26 +34,6 @@ export class TronAccountsService {
     );
   }
 
-  async updateTetherAvailability(
-    address: string,
-    isTetherAvailable: boolean,
-  ): Promise<TronAccount> {
-    return this.tronAccountsRepository.updateTetherAvailability(
-      address,
-      isTetherAvailable,
-    );
-  }
-
-  async updateTrxAvailability(
-    address: string,
-    isEnoughTrx: boolean,
-  ): Promise<TronAccount> {
-    return this.tronAccountsRepository.updateTrxAvailability(
-      address,
-      isEnoughTrx,
-    );
-  }
-
   async updateActivationStatus(
     address: string,
     isActivated: boolean,

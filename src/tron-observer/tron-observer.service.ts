@@ -1,11 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { UserRole } from 'src/models/user.model';
+import { User, UserRole } from 'src/models/user.model';
 import { TronAccountInfo } from 'src/providers/trongrid/types';
 import { TronAccountsService } from 'src/tron-accounts/tron-accounts.service';
 import { TronService } from 'src/tron/tron.service';
 import { UsersService } from 'src/users/users.service';
 import { UserBalanceInfo } from './types';
+import { minimumAdminTrxBalance } from './costants';
+import { NotEnoughAdminTrxBalanceException as NotEnoughAdminsTrxBalancesException } from './errors/not-enough-admin-trx-balance.exception';
 
 @Injectable()
 export class TronObserverService {
@@ -15,7 +16,7 @@ export class TronObserverService {
     private readonly tronService: TronService,
     private readonly tronAccountsService: TronAccountsService,
   ) {
-    this.updateActivationStatus();
+    this.accountActivation();
   }
   // @Cron(CronExpression.EVERY_5_SECONDS)
   async getTronBalances() {
@@ -36,7 +37,7 @@ export class TronObserverService {
     console.log(balances);
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  // @Cron(CronExpression.EVERY_10_SECONDS)
   async updateActivationStatus() {
     const users = await this.usersService.getAllUsers();
     for (const user of users) {
@@ -55,6 +56,44 @@ export class TronObserverService {
         user.tronAccount.address,
         isActive,
       );
+    }
+  }
+
+  private async getAdminAccountWithValidTrxBalance(): Promise<User> {
+    const admins = await this.usersService.getAllAdmins();
+    for (const admin of admins) {
+      const { address } = admin.tronAccount;
+      const { trx }: TronAccountInfo =
+        await this.tronService.getTronAccountInfoByAddress(address);
+      if (trx > minimumAdminTrxBalance) {
+        return admin;
+      }
+    }
+    throw new NotEnoughAdminsTrxBalancesException();
+  }
+
+  // @Cron(CronExpression.EVERY_10_SECONDS)
+  async accountActivation() {
+    const traders = await this.usersService.getAllTraders();
+    for (const trader of traders) {
+      try {
+        const traderTronAccount = trader.tronAccount;
+        const { tronAccount: adminTronAccount } =
+          await this.getAdminAccountWithValidTrxBalance();
+        const trxAmount = 0.000001;
+        const transactionId = await this.tronService.sendTrx({
+          from: adminTronAccount,
+          to: traderTronAccount,
+          trx: trxAmount,
+        });
+        this.logger.verbose(
+          `Создана транзакция ${transactionId} на перевод ${trxAmount} TRX с ${adminTronAccount.address} на ${traderTronAccount.address}`,
+        );
+        // const shashTronAccount = this.tronAccountsService.getByAddress(a);
+        // this.tronService.sendTrx({from})
+      } catch (error) {
+        this.logger.warn(error);
+      }
     }
   }
 }

@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { TronAccount } from 'src/models/tron-account.model';
 import { TronService } from './tron.service';
 import { SendUsdtDto } from 'src/providers/tronweb/dto/send-usdt.dto';
 import { Transaction } from 'src/models/transaction.model';
@@ -35,5 +34,18 @@ export class TronController {
   @Get('account-info/:address')
   async getAccountInfo(@Param('address') address: string): Promise<any> {
     return this.tronService.getAccountInfo(address);
+  }
+  @Get('transaction/:id')
+  async getTransaction(@Param('id') transactionId: string): Promise<any> {
+    const transaction = await this.tronService.getTransaction(transactionId);
+    //SUCCESS
+    return transaction;
+  }
+  @Get('transactionInfo/:id')
+  async getTransactionInfo(@Param('id') transactionId: string): Promise<any> {
+    const transaction = await this.tronService.getTransactionInfo(
+      transactionId,
+    );
+    return transaction;
   }
 }

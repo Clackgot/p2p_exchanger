@@ -16,5 +16,6 @@ import { TronAccountsModule } from 'src/tron-accounts/tron-accounts.module';
   ],
   providers: [TransactionsService, TransactionsRepository],
   controllers: [TransactionsController],
+  exports: [TransactionsService],
 })
 export class TransactionsModule {}

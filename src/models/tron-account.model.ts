@@ -19,18 +19,6 @@ export class TronAccount {
   @Column({ name: 'public_key', nullable: true })
   publicKey: string;
 
-  @Column({
-    name: 'isTetherAvailable',
-    default: false,
-  })
-  isTetherAvailable: boolean;
-
-  @Column({
-    name: 'isEnoughTrx',
-    default: false,
-  })
-  isEnoughTrx: boolean;
-
   @Column({ name: 'isActivated', default: false })
   isActivated: boolean;
 }

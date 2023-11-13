@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/models/user.model';
+import { User, UserRole } from 'src/models/user.model';
 import { EntityManager, Repository } from 'typeorm';
 import { Balance } from 'src/models/balance.model';
 import { TronAccount } from 'src/models/tron-account.model';
@@ -18,6 +18,21 @@ export class UsersRepository {
 
   async getAllUsers(): Promise<User[]> {
     return this.usersRepository.find();
+  }
+
+  async getAllTraders(): Promise<User[]> {
+    return this.usersRepository.find({ where: { role: UserRole.trader } });
+  }
+
+  async getAllMechants(): Promise<User[]> {
+    return this.usersRepository.find({ where: { role: UserRole.merchant } });
+  }
+
+  async getAllAdmins(): Promise<User[]> {
+    return this.usersRepository.find({ where: { role: UserRole.admin } });
+  }
+  async getAllGuests(): Promise<User[]> {
+    return this.usersRepository.find({ where: { role: UserRole.guest } });
   }
 
   async getUserByTelegramId(id: number): Promise<User | null> {

@@ -13,4 +13,6 @@ export interface ITronwebService {
   base58ToHex(base58: string): string;
   getAccountInfo(address: string): Promise<any>;
   isAccountActivate(account: TronAccount): Promise<boolean>;
+  getTransaction(transactionId: string): Promise<any>;
+  getTransactionInfo(transactionId: string): Promise<any>;
 }

@@ -11,6 +11,20 @@ export class UsersService {
     return this.usersRepository.getAllUsers();
   }
 
+  async getAllTraders(): Promise<User[]> {
+    return this.usersRepository.getAllTraders();
+  }
+  async getAllMechants(): Promise<User[]> {
+    return this.usersRepository.getAllMechants();
+  }
+
+  async getAllAdmins(): Promise<User[]> {
+    return this.usersRepository.getAllAdmins();
+  }
+  async getAllGuests(): Promise<User[]> {
+    return this.usersRepository.getAllGuests();
+  }
+
   async getUserByTelegramId(id: number): Promise<User | null> {
     return this.usersRepository.getUserByTelegramId(id);
   }

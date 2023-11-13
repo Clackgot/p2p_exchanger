@@ -31,6 +31,16 @@ export class TronService implements ITronService {
   async sendUsdt(dto: SendUsdtDto): Promise<Transaction> {
     return this.tronwebService.sendUsdt(dto);
   }
+  async getTransaction(transactionId: string): Promise<any> {
+    const transaction = await this.tronwebService.getTransaction(transactionId);
+    return transaction;
+  }
+  async getTransactionInfo(transactionId: string): Promise<any> {
+    const transaction = await this.tronwebService.getTransactionInfo(
+      transactionId,
+    );
+    return transaction;
+  }
 
   async sendTrx(dto: SendTrxDto): Promise<string> {
     return this.tronwebService.sendTrx(dto);

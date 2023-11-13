@@ -1,15 +1,9 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { TronAccount } from './tron-account.model';
 
 export enum TransactionStatus {
   Created = 'CREATED',
-  Confirmed = 'COBFIRMED',
+  Confirmed = 'CONFIRMED',
   Rejected = 'REJECTED',
 }
 
@@ -24,7 +18,7 @@ export enum TransactionObjective {
   name: 'transactions',
 })
 export class Transaction {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn({ unique: true, nullable: false })
   id: string;
 
   @ManyToOne(() => TronAccount)
@@ -46,12 +40,12 @@ export class Transaction {
     enum: TransactionStatus,
     default: TransactionStatus.Created,
   })
-  status: TransactionStatus;
+  status?: TransactionStatus;
 
   @Column({
     name: 'objective',
     enum: TransactionObjective,
     default: TransactionObjective.None,
   })
-  objective: TransactionStatus;
+  objective?: TransactionStatus;
 }
