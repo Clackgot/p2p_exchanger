@@ -28,7 +28,7 @@ export class TronService implements ITronService {
   hexToBase58(hex: string): string {
     return this.tronwebService.hexToBase58(hex);
   }
-  async sendUsdt(dto: SendUsdtDto): Promise<Transaction> {
+  async sendUsdt(dto: SendUsdtDto): Promise<string> {
     return this.tronwebService.sendUsdt(dto);
   }
   async getTransaction(transactionId: string): Promise<any> {

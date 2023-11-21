@@ -3,8 +3,8 @@ import { TronAccount } from './tron-account.model';
 
 export enum TransactionStatus {
   Created = 'CREATED',
-  Confirmed = 'CONFIRMED',
-  Rejected = 'REJECTED',
+  Success = 'SUCCESS',
+  Revert = 'REVERT',
 }
 
 export enum TransactionObjective {

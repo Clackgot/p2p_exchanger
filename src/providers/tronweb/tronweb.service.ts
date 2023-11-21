@@ -57,7 +57,7 @@ export class TronwebService implements ITronwebService {
     }
   }
 
-  async sendUsdt(dto: SendUsdtDto): Promise<Transaction> {
+  async sendUsdt(dto: SendUsdtDto): Promise<string> {
     this.tronWeb.setAddress(dto.from.address);
     this.tronWeb.setPrivateKey(dto.from.privateKey);
     const { to, usdt } = dto;

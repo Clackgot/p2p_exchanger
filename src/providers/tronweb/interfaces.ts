@@ -1,4 +1,3 @@
-import { Transaction } from 'src/models/transaction.model';
 import { TronAccount } from 'src/models/tron-account.model';
 import { SendUsdtDto } from './dto/send-usdt.dto';
 import { SendTrxDto } from './dto/send-trx.dto';
@@ -7,7 +6,7 @@ import { CreateTronAccountDto } from 'src/tron-accounts/dto/create-tron-account.
 export interface ITronwebService {
   getTronAccountFromMnemonic(seedPhrase: string): CreateTronAccountDto;
   generateTronAccount(): CreateTronAccountDto;
-  sendUsdt(dto: SendUsdtDto): Promise<Transaction>;
+  sendUsdt(dto: SendUsdtDto): Promise<string>;
   sendTrx(dto: SendTrxDto): Promise<string>;
   hexToBase58(hex: string): string;
   base58ToHex(base58: string): string;

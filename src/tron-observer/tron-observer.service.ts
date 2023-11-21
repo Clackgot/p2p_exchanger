@@ -23,7 +23,7 @@ export class TronObserverService {
     private readonly tronAccountsService: TronAccountsService,
     private readonly transactionsService: TransactionsService,
   ) {
-    this.accountActivation();
+    this.updateTransactionsStatuses();
   }
 
   /**
@@ -46,6 +46,52 @@ export class TronObserverService {
 
     const balances = await Promise.all(tradersAccounts);
     console.log(balances);
+  }
+  @Cron(CronExpression.EVERY_30_SECONDS)
+  async updateTransactionsStatuses() {
+    const transactions = await this.transactionsService.getTransations();
+    const createdTransactions = transactions.filter(
+      (s) => s.status == TransactionStatus.Created,
+    );
+    // TODO: Нужен рефакторинг. Вынести получение актуально статуса транзакции в отдельный сервис
+    for (const transaction of createdTransactions) {
+      const transactionInfo1 = await this.tronService.getTransaction(
+        transaction.id,
+      );
+      const transactionInfo2 = await this.tronService.getTransactionInfo(
+        transaction.id,
+      );
+
+      const successCondition1 =
+        transactionInfo1?.ret?.[0]?.contractRet === TransactionStatus.Success;
+
+      const successCondition2 =
+        JSON.stringify(transactionInfo2?.contractResult) ===
+        JSON.stringify(['']);
+
+      if (successCondition1 && successCondition2) {
+        this.transactionsService.updateTransactionStatus(
+          transaction.id,
+          TransactionStatus.Success,
+        );
+        this.logger.verbose(`Транзакция ${transaction.id} подтверждена`);
+        continue;
+      }
+
+      const revertCondition1 =
+        transactionInfo1?.ret?.[0]?.contractRet === TransactionStatus.Revert;
+      const revertCondition2 =
+        transactionInfo2?.receipt?.result === TransactionStatus.Revert;
+
+      if (revertCondition1 || revertCondition2) {
+        await this.transactionsService.updateTransactionStatus(
+          transaction.id,
+          TransactionStatus.Revert,
+        );
+        this.logger.warn(`Транзакция ${transaction.id} отменена`);
+        continue;
+      }
+    }
   }
 
   /**
@@ -92,7 +138,7 @@ export class TronObserverService {
   /**
    * Создание транзакций на активацию аккаунтов трейдеров, для которых ещё не была инициирована активация
    */
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_30_SECONDS)
   async accountActivation() {
     const traders = await this.usersService.getAllTraders();
     const disabledTradersAccounts = traders.filter(
@@ -106,9 +152,10 @@ export class TronObserverService {
 
       const transactionExsist = transactions.some(
         (t) =>
-          t.to.address === trader.tronAccount.address &&
-          t.status === TransactionStatus.Created &&
-          t.objective === TransactionObjective.ActivateAccount,
+          (t.to.address === trader.tronAccount.address &&
+            t.status === TransactionStatus.Created) ||
+          (t.status === TransactionStatus.Success &&
+            t.objective === TransactionObjective.ActivateAccount),
       );
       if (transactionExsist) {
         this.logger.verbose(
@@ -126,6 +173,7 @@ export class TronObserverService {
           to: traderTronAccount,
           trx: trxAmount,
         });
+
         await this.transactionsService.createTransation({
           id: transactionId,
           from: adminTronAccount,

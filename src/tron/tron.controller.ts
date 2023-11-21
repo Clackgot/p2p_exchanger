@@ -23,7 +23,7 @@ export class TronController {
   }
 
   @Post('usdt')
-  async sendUsdt(@Body() dto: SendUsdtDto): Promise<Transaction> {
+  async sendUsdt(@Body() dto: SendUsdtDto): Promise<string> {
     return this.tronService.sendUsdt(dto);
   }
   @Post('trx')
