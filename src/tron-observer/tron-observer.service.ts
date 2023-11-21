@@ -7,6 +7,12 @@ import { UsersService } from 'src/users/users.service';
 import { UserBalanceInfo } from './types';
 import { minimumAdminTrxBalance } from './costants';
 import { NotEnoughAdminTrxBalanceException as NotEnoughAdminsTrxBalancesException } from './errors/not-enough-admin-trx-balance.exception';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { TransactionsService } from 'src/transactions/transactions.service';
+import {
+  TransactionObjective,
+  TransactionStatus,
+} from 'src/models/transaction.model';
 
 @Injectable()
 export class TronObserverService {
@@ -15,11 +21,16 @@ export class TronObserverService {
     private readonly usersService: UsersService,
     private readonly tronService: TronService,
     private readonly tronAccountsService: TronAccountsService,
+    private readonly transactionsService: TransactionsService,
   ) {
     this.accountActivation();
   }
+
+  /**
+   * Выводит балансы трейдеров
+   */
   // @Cron(CronExpression.EVERY_5_SECONDS)
-  async getTronBalances() {
+  async getTradersTronBalances() {
     const users = await this.usersService.getAllUsers();
     const tradersAccounts: Promise<UserBalanceInfo>[] = users
       .filter((u) => u.role === UserRole.trader)
@@ -37,7 +48,10 @@ export class TronObserverService {
     console.log(balances);
   }
 
-  // @Cron(CronExpression.EVERY_10_SECONDS)
+  /**
+   * Проверяет активацию аккаунта в сети TRON и обновляет статус аккаунта в системе
+   */
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async updateActivationStatus() {
     const users = await this.usersService.getAllUsers();
     for (const user of users) {
@@ -59,6 +73,9 @@ export class TronObserverService {
     }
   }
 
+  /**
+   * Получение аккаунта администратора с непустыми балансом TRX
+   */
   private async getAdminAccountWithValidTrxBalance(): Promise<User> {
     const admins = await this.usersService.getAllAdmins();
     for (const admin of admins) {
@@ -72,10 +89,33 @@ export class TronObserverService {
     throw new NotEnoughAdminsTrxBalancesException();
   }
 
-  // @Cron(CronExpression.EVERY_10_SECONDS)
+  /**
+   * Создание транзакций на активацию аккаунтов трейдеров, для которых ещё не была инициирована активация
+   */
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async accountActivation() {
     const traders = await this.usersService.getAllTraders();
-    for (const trader of traders) {
+    const disabledTradersAccounts = traders.filter(
+      (trader) => !trader.tronAccount.isActivated,
+    );
+    if (disabledTradersAccounts.length === 0) {
+      this.logger.verbose(`Аккаунтов для активации не найдено`);
+    }
+    for (const trader of disabledTradersAccounts) {
+      const transactions = await this.transactionsService.getTransations();
+
+      const transactionExsist = transactions.some(
+        (t) =>
+          t.to.address === trader.tronAccount.address &&
+          t.status === TransactionStatus.Created &&
+          t.objective === TransactionObjective.ActivateAccount,
+      );
+      if (transactionExsist) {
+        this.logger.verbose(
+          `Транзакция на активацию аккаунта ${trader.tronAccount.address} уже существует`,
+        );
+        continue;
+      }
       try {
         const traderTronAccount = trader.tronAccount;
         const { tronAccount: adminTronAccount } =
@@ -86,11 +126,18 @@ export class TronObserverService {
           to: traderTronAccount,
           trx: trxAmount,
         });
+        await this.transactionsService.createTransation({
+          id: transactionId,
+          from: adminTronAccount,
+          to: traderTronAccount,
+          trx: trxAmount * 1_000_000,
+          usdt: 0,
+          status: TransactionStatus.Created,
+          objective: TransactionObjective.ActivateAccount,
+        });
         this.logger.verbose(
           `Создана транзакция ${transactionId} на перевод ${trxAmount} TRX с ${adminTronAccount.address} на ${traderTronAccount.address}`,
         );
-        // const shashTronAccount = this.tronAccountsService.getByAddress(a);
-        // this.tronService.sendTrx({from})
       } catch (error) {
         this.logger.warn(error);
       }

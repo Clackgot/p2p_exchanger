@@ -1,4 +1,8 @@
-import { Transaction, TransactionStatus } from 'src/models/transaction.model';
+import {
+  Transaction,
+  TransactionObjective,
+  TransactionStatus,
+} from 'src/models/transaction.model';
 import { TronAccount } from 'src/models/tron-account.model';
 
 export class CreateTransactionDto implements Transaction {
@@ -8,5 +12,5 @@ export class CreateTransactionDto implements Transaction {
   usdt: number;
   trx: number;
   status?: TransactionStatus;
-  objective?: TransactionStatus;
+  objective?: TransactionObjective;
 }

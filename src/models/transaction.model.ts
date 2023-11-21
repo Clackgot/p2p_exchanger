@@ -21,11 +21,11 @@ export class Transaction {
   @PrimaryColumn({ unique: true, nullable: false })
   id: string;
 
-  @ManyToOne(() => TronAccount)
+  @ManyToOne(() => TronAccount, { eager: true })
   @JoinColumn({ name: 'from' })
   from: TronAccount;
 
-  @ManyToOne(() => TronAccount)
+  @ManyToOne(() => TronAccount, { eager: true })
   @JoinColumn({ name: 'to' })
   to: TronAccount;
 
@@ -47,5 +47,5 @@ export class Transaction {
     enum: TransactionObjective,
     default: TransactionObjective.None,
   })
-  objective?: TransactionStatus;
+  objective?: TransactionObjective;
 }
