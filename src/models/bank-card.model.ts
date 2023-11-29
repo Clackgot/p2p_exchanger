@@ -4,7 +4,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.model';
@@ -13,8 +13,11 @@ import { User } from './user.model';
   name: 'bank_cards',
 })
 export class BankCard {
-  @PrimaryColumn({ type: 'text' })
+  @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({ name: 'number', nullable: false })
+  number: string;
 
   @Column({ name: 'holder', nullable: false })
   holder: string;

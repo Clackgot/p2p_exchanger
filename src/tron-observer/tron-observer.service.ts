@@ -53,44 +53,24 @@ export class TronObserverService {
     const createdTransactions = transactions.filter(
       (s) => s.status == TransactionStatus.Created,
     );
-    // TODO: Нужен рефакторинг. Вынести получение актуально статуса транзакции в отдельный сервис
     for (const transaction of createdTransactions) {
-      const transactionInfo1 = await this.tronService.getTransaction(
-        transaction.id,
-      );
-      const transactionInfo2 = await this.tronService.getTransactionInfo(
+      const transactionStatus = await this.tronService.getTransactionStatus(
         transaction.id,
       );
 
-      const successCondition1 =
-        transactionInfo1?.ret?.[0]?.contractRet === TransactionStatus.Success;
-
-      const successCondition2 =
-        JSON.stringify(transactionInfo2?.contractResult) ===
-        JSON.stringify(['']);
-
-      if (successCondition1 && successCondition2) {
-        this.transactionsService.updateTransactionStatus(
-          transaction.id,
-          TransactionStatus.Success,
-        );
-        this.logger.verbose(`Транзакция ${transaction.id} подтверждена`);
-        continue;
+      switch (transactionStatus) {
+        case TransactionStatus.Success:
+          this.logger.verbose(`Транзакция ${transaction.id} подтверждена`);
+          break;
+        case TransactionStatus.Revert:
+          this.logger.verbose(`Транзакция ${transaction.id} отменена`);
+          break;
       }
 
-      const revertCondition1 =
-        transactionInfo1?.ret?.[0]?.contractRet === TransactionStatus.Revert;
-      const revertCondition2 =
-        transactionInfo2?.receipt?.result === TransactionStatus.Revert;
-
-      if (revertCondition1 || revertCondition2) {
-        await this.transactionsService.updateTransactionStatus(
-          transaction.id,
-          TransactionStatus.Revert,
-        );
-        this.logger.warn(`Транзакция ${transaction.id} отменена`);
-        continue;
-      }
+      this.transactionsService.updateTransactionStatus(
+        transaction.id,
+        transactionStatus,
+      );
     }
   }
 

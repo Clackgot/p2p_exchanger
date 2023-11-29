@@ -1,4 +1,9 @@
-import { ConflictException, Injectable, Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User, UserRole } from 'src/models/user.model';
 import { EntityManager, Repository } from 'typeorm';
@@ -7,6 +12,10 @@ import { TronAccount } from 'src/models/tron-account.model';
 import { CreateUserByTelegramDto } from './dto/create-user-by-telegram.dto';
 import { TelegramUser } from 'src/models/telegram-user.model';
 import { TronService } from 'src/tron/tron.service';
+import {
+  TelegramUserNotFoundException,
+  UserNotFoundException,
+} from './errors/user-not-found.exception';
 
 @Injectable()
 export class UsersRepository {
@@ -35,28 +44,49 @@ export class UsersRepository {
     return this.usersRepository.find({ where: { role: UserRole.guest } });
   }
 
-  async getUserByTelegramId(id: number): Promise<User | null> {
-    return this.usersRepository.findOne({
+  async getUserByTelegramId(telegramId: number): Promise<User> {
+    const user = await this.usersRepository.findOne({
       where: {
         telegramUser: {
-          id,
+          telegramId,
         },
       },
     });
+
+    if (!user) {
+      throw new TelegramUserNotFoundException(telegramId);
+    }
+    return user;
   }
 
-  async getUserById(id: string): Promise<User | null> {
-    return this.usersRepository.findOne({
+  async isTelegramUserExists(telegramId: number): Promise<boolean> {
+    const user = await this.usersRepository.findOne({
+      where: {
+        telegramUser: {
+          telegramId,
+        },
+      },
+    });
+    return !!user;
+  }
+
+  async getUserById(id: string): Promise<User> {
+    const user = await this.usersRepository.findOne({
       where: {
         id,
       },
     });
+
+    if (!user) {
+      throw new UserNotFoundException(id);
+    }
+    return user;
   }
 
   async createUserByTelegram(dto: CreateUserByTelegramDto): Promise<User> {
     const manager = this.usersRepository.manager;
-    const { id, username } = dto;
-    const exsistUser = await this.getUserByTelegramId(id);
+    const { telegramId, username } = dto;
+    const exsistUser = await this.isTelegramUserExists(telegramId);
 
     if (exsistUser) {
       throw new ConflictException('Пользователь уже существует');
@@ -65,7 +95,7 @@ export class UsersRepository {
     return manager.transaction(async (entityManager: EntityManager) => {
       try {
         const tronAccount: TronAccount =
-          (await this.tronService.generateTronAccount()) as TronAccount;
+          this.tronService.generateTronAccount() as TronAccount;
 
         const user = new User();
 
@@ -75,15 +105,22 @@ export class UsersRepository {
         user.balance.trx = 0;
 
         user.telegramUser = new TelegramUser();
-        user.telegramUser.id = id;
+        user.telegramUser.telegramId = telegramId;
         user.telegramUser.username = username;
         user.tronAccount = tronAccount;
-
         return entityManager.save(user);
       } catch (err) {
         this.logger.warn(err.message);
         throw err;
       }
     });
+  }
+
+  async deleteUserById(id: string): Promise<User> {
+    const user = await this.getUserById(id);
+
+    await this.usersRepository.remove(user);
+
+    return user;
   }
 }

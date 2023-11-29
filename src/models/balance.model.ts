@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from './user.model';
 
 @Entity({
   name: 'balances',
@@ -15,4 +16,10 @@ export class Balance {
 
   @Column({ name: 'rub', nullable: false })
   rub: number;
+
+  @OneToOne(() => User, (user) => user.balance, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  user: User;
 }

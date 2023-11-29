@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { User } from './user.model';
 
 @Entity({
   name: 'tron_accounts',
@@ -21,4 +28,10 @@ export class TronAccount {
 
   @Column({ name: 'isActivated', default: false })
   isActivated: boolean;
+
+  @OneToOne(() => User, (user) => user.tronAccount, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  user: User;
 }

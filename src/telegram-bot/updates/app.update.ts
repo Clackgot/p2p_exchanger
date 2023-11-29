@@ -15,11 +15,14 @@ export class AppUpdate {
   @Start()
   async start(ctx: SceneContext) {
     if (!ctx.message?.from) return ctx.reply('Не удалось найти пользователя');
-    const { id, username } = ctx.message?.from;
-    if (!id) return ctx.reply('Не удалось найти пользователя');
-    let user = await this.usersService.getUserByTelegramId(id);
+    const { id: telegramId, username } = ctx.message?.from;
+    if (!telegramId) return ctx.reply('Не удалось найти пользователя');
+    let user = await this.usersService.getUserByTelegramId(telegramId);
     if (!user)
-      user = await this.usersService.createUserByTelegram({ id, username });
+      user = await this.usersService.createUserByTelegram({
+        telegramId,
+        username,
+      });
     ctx.scene.enter(getSceneByUserRole(user.role));
   }
 

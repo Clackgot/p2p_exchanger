@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from 'src/models/user.model';
 import { CreateUserByTelegramDto } from './dto/create-user-by-telegram.dto';
@@ -17,5 +17,10 @@ export class UsersController {
     @Body() dto: CreateUserByTelegramDto,
   ): Promise<User> {
     return this.usersService.createUserByTelegram(dto);
+  }
+
+  @Delete('/:id')
+  async deleteUserById(@Param('id') id: string): Promise<User> {
+    return this.usersService.deleteUserById(id);
   }
 }

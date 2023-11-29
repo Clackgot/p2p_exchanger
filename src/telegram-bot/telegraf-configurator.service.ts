@@ -16,26 +16,35 @@ export class TelegrafConfigurator implements TelegrafOptionsFactory {
 
   private setUserRoleMiddleware = async (ctx: any, next: any) => {
     try {
-      const id =
+      const telegramId =
         ctx?.message?.from?.id || ctx?.update?.callback_query?.from?.id;
       const username =
         ctx?.message?.from?.username ||
         ctx?.update?.callback_query?.from?.username;
 
-      if (!id) throw new NotFoundException('Не удалось получить ID');
-      let user = await this.usersService.getUserByTelegramId(id);
-      if (!user) {
-        user = await this.usersService.createUserByTelegram({
-          id,
+      if (!telegramId) throw new NotFoundException('Не удалось получить ID');
+
+      const isTelegramUserExists = await this.usersService.isTelegramUserExists(
+        telegramId,
+      );
+      if (!isTelegramUserExists) {
+        const user = await this.usersService.createUserByTelegram({
+          telegramId,
           username,
         });
+        ctx.state.role = user.role;
+        console.log(ctx.state.role);
+      } else {
+        const user = await this.usersService.getUserByTelegramId(telegramId);
+        ctx.state.role = user.role;
+        console.log(ctx.state.role);
       }
-      ctx.state.role = user.role;
       await next();
     } catch (error) {
       this.logger.error(
         `Произошла ошибка в setUserRoleMiddleware: ${error.message}`,
       );
+      console.log(error);
       ctx?.reply('Произошла неизвестная ошибка');
       ctx?.scene?.leave();
     }
@@ -96,7 +105,7 @@ export class TelegrafConfigurator implements TelegrafOptionsFactory {
     return {
       token: applicationConstants.TELEGRAM.TOKEN,
       middlewares: [
-        session({ store: this.store }),
+        session(),
         this.setUserRoleMiddleware.bind(this),
         this.loggerMiddleware,
       ],

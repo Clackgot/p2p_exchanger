@@ -2,9 +2,9 @@ import { BankCard } from 'src/models/bank-card.model';
 import { User } from 'src/models/user.model';
 
 export class CreateCardDto
-  implements Omit<BankCard, 'createdDate' | 'updatedDate'>
+  implements Pick<BankCard, 'number' | 'holder' | 'issuer' | 'owner'>
 {
-  id: string;
+  number: string;
   holder: string;
   issuer?: string | undefined;
   owner: User;

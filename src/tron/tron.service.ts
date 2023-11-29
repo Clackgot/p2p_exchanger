@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Transaction } from 'src/models/transaction.model';
+import { Transaction, TransactionStatus } from 'src/models/transaction.model';
 import { TronAccount } from 'src/models/tron-account.model';
 import { ITrongridService } from 'src/providers/trongrid/interfaces';
 import { TrongridService } from 'src/providers/trongrid/trongrid.service';
@@ -62,5 +62,28 @@ export class TronService implements ITronService {
 
   async getAccountInfo(address: string): Promise<any> {
     return this.tronwebService.getAccountInfo(address);
+  }
+
+  async getTransactionStatus(id: string): Promise<TransactionStatus> {
+    const transactionInfo1 = await this.getTransaction(id);
+    const transactionInfo2 = await this.getTransactionInfo(id);
+
+    const successCondition1 =
+      transactionInfo1?.ret?.[0]?.contractRet === TransactionStatus.Success;
+
+    const successCondition2 =
+      JSON.stringify(transactionInfo2?.contractResult) === JSON.stringify(['']);
+
+    const revertCondition1 =
+      transactionInfo1?.ret?.[0]?.contractRet === TransactionStatus.Revert;
+    const revertCondition2 =
+      transactionInfo2?.receipt?.result === TransactionStatus.Revert;
+
+    if (successCondition1 && successCondition2)
+      return TransactionStatus.Success;
+
+    if (revertCondition1 || revertCondition2) return TransactionStatus.Revert;
+
+    return TransactionStatus.Created;
   }
 }

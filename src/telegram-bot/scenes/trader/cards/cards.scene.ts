@@ -66,7 +66,7 @@ export class TraderCardsScene {
     const buttons: InlineKeyboardButton[][] = cards.map<InlineKeyboardButton[]>(
       (card) => [
         {
-          text: card.id,
+          text: card.number,
           callback_data: `open_card_${card.id}`,
         },
         { text: 'Удалить', callback_data: `remove_card_${card.id}` },

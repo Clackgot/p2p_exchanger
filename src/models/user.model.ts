@@ -28,28 +28,31 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => TelegramUser, {
+  @OneToOne(() => TelegramUser, (telegramUser) => telegramUser.user, {
     nullable: false,
     eager: true,
-    cascade: ['insert', 'update', 'soft-remove', 'recover'],
+    cascade: ['insert', 'update'],
+    onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'telegram_user' })
+  @JoinColumn()
   telegramUser: TelegramUser;
 
-  @OneToOne(() => TronAccount, {
+  @OneToOne(() => TronAccount, (tronAccount) => tronAccount.user, {
     nullable: false,
     eager: true,
-    cascade: ['insert', 'update', 'soft-remove', 'recover', 'remove'],
+    cascade: ['insert', 'update'],
+    onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'tron_account' })
+  @JoinColumn()
   tronAccount: TronAccount;
 
-  @OneToOne(() => Balance, {
+  @OneToOne(() => Balance, (balance) => balance.user, {
     nullable: false,
-    cascade: ['insert', 'update', 'soft-remove', 'recover'],
     eager: true,
+    cascade: ['insert', 'update'],
+    onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'balance' })
+  @JoinColumn()
   balance: Balance;
 
   @Column({
@@ -62,10 +65,10 @@ export class User {
 
   @OneToMany(() => BankCard, (card) => card.owner, {
     eager: true,
-    cascade: ['insert', 'update', 'soft-remove', 'recover'],
     nullable: true,
+    cascade: true,
   })
-  @JoinColumn({ name: 'bank_cards' })
+  @JoinColumn()
   bankCards: BankCard[];
 
   @CreateDateColumn()

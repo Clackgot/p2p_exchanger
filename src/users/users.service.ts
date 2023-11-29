@@ -25,11 +25,15 @@ export class UsersService {
     return this.usersRepository.getAllGuests();
   }
 
-  async getUserByTelegramId(id: number): Promise<User | null> {
+  async getUserByTelegramId(id: number): Promise<User> {
     return this.usersRepository.getUserByTelegramId(id);
   }
 
-  async getUserById(id: string): Promise<User | null> {
+  async isTelegramUserExists(telegramId: number): Promise<boolean> {
+    return this.usersRepository.isTelegramUserExists(telegramId);
+  }
+
+  async getUserById(id: string): Promise<User> {
     return this.usersRepository.getUserById(id);
   }
 
@@ -37,5 +41,9 @@ export class UsersService {
     @Body() dto: CreateUserByTelegramDto,
   ): Promise<User> {
     return this.usersRepository.createUserByTelegram(dto);
+  }
+
+  async deleteUserById(id: string): Promise<User> {
+    return this.usersRepository.deleteUserById(id);
   }
 }

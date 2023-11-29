@@ -33,13 +33,14 @@ export class CardsRepository {
   }
 
   async createCard(dto: CreateCardDto): Promise<BankCard> {
-    const { id } = dto;
+    const { number } = dto;
     const exsistCard = await this.bankCardsRepository.findOne({
       where: {
-        id,
+        number,
       },
     });
-    if (exsistCard) throw new ConflictException(`Карта ${id} уже существует`);
+    if (exsistCard)
+      throw new ConflictException(`Карта ${number} уже существует`);
     return this.bankCardsRepository.save(dto);
   }
   async getCardById(id: string): Promise<BankCard> {

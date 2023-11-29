@@ -3,16 +3,22 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  PrimaryColumn,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { User } from './user.model';
 
 @Entity({
   name: 'telegram_users',
 })
 export class TelegramUser {
-  @PrimaryColumn({ type: 'bigint' })
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ type: 'bigint' })
+  telegramId: number;
 
   @Column({ name: 'username', nullable: true })
   username?: string;
@@ -25,4 +31,10 @@ export class TelegramUser {
 
   @DeleteDateColumn()
   deletedDate: Date;
+
+  @OneToOne(() => User, (user) => user.telegramUser, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  user: User;
 }
