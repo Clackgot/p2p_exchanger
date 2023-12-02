@@ -67,9 +67,9 @@ export class TraderCardsScene {
       (card) => [
         {
           text: card.number,
-          callback_data: `open_card_${card.id}`,
+          callback_data: `open_card_${card.number}`,
         },
-        { text: 'Удалить', callback_data: `remove_card_${card.id}` },
+        { text: 'Удалить', callback_data: `remove_card_${card.number}` },
       ],
     );
     const keyboard: InlineKeyboardMarkup = {
@@ -109,7 +109,7 @@ export class TraderCardsScene {
     }
     const cardNumber = match[1];
 
-    const card = await this.cardsService.getCardById(cardNumber);
+    const card = await this.cardsService.getCardByNumber(cardNumber);
     const replyMessage = displayCardMessage(card);
     await ctx.reply(replyMessage, { parse_mode: 'HTML' });
     await ctx.answerCbQuery();
@@ -133,10 +133,11 @@ export class TraderCardsScene {
       await ctx.reply('Не удалось получить номер карты');
       return ctx.scene.leave();
     }
-    const id = match[1];
-    const card = await this.cardsService.removeCard({ id });
+    const number = match[1];
+    const card = await this.cardsService.removeCard({ number });
     const message = displayCardMessage(card);
+    await ctx.deleteMessage();
     await ctx.reply(message, { parse_mode: 'HTML' });
-    await ctx.answerCbQuery(`Карта ${id} удалена`);
+    await ctx.answerCbQuery(`Карта ${number} удалена`);
   }
 }

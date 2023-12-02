@@ -22,6 +22,9 @@ export class CardsService {
   async getCardById(id: string): Promise<BankCard> {
     return this.cardsRepository.getCardById(id);
   }
+  async getCardByNumber(number: string): Promise<BankCard> {
+    return this.cardsRepository.getCardByNumber(number);
+  }
   async removeCard(dto: RemoveCardDto): Promise<BankCard> {
     return this.cardsRepository.removeCard(dto);
   }

@@ -53,16 +53,24 @@ export class CardsRepository {
     return card;
   }
 
+  async getCardByNumber(number: string): Promise<BankCard> {
+    const card = await this.bankCardsRepository.findOne({
+      where: {
+        number,
+      },
+    });
+    if (!card) throw new NotFoundException(`Карта ${number} не найдена`);
+    return card;
+  }
+
   async removeCard(dto: RemoveCardDto): Promise<BankCard> {
     try {
-      const { id } = dto;
-      const card = await this.getCardById(id);
-      const removedCard = await this.bankCardsRepository.remove(card);
-      removedCard.id = id;
-      return removedCard;
+      const { number } = dto;
+      const card = await this.getCardByNumber(number);
+      return this.bankCardsRepository.remove(card);
     } catch (error) {
       throw new InternalServerErrorException(
-        `Не удалось удалить карту ${dto?.id}`,
+        `Не удалось удалить карту ${dto?.number}`,
       );
     }
   }
