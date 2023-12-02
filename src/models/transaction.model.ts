@@ -1,42 +1,51 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { User } from './user.model';
-import { TransactionAmount } from './transaction-amount.model';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { TronAccount } from './tron-account.model';
 
 export enum TransactionStatus {
-  Created = 'Создана',
-  Confirmed = 'Подтверждена',
-  Rejected = 'Отклонена',
+  Created = 'CREATED',
+  Success = 'SUCCESS',
+  Revert = 'REVERT',
+}
+
+export enum TransactionObjective {
+  ActivateAccount = 'ACTIVATE_ACCOUNT',
+  WithdrawUsdt = 'WITHDRAW_USDT',
+  ReplenishingTrx = 'REPLENISHING',
+  None = 'NONE',
 }
 
 @Entity({
   name: 'transactions',
 })
 export class Transaction {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn({ unique: true, nullable: false })
   id: string;
 
-  @OneToOne(() => User)
-  @JoinColumn({ name: 'sender' })
-  sender: User;
+  @ManyToOne(() => TronAccount, { eager: true })
+  @JoinColumn({ name: 'from' })
+  from: TronAccount;
 
-  @OneToOne(() => User)
-  @JoinColumn({ name: 'recipient' })
-  recipient: User;
+  @ManyToOne(() => TronAccount, { eager: true })
+  @JoinColumn({ name: 'to' })
+  to: TronAccount;
 
-  @OneToOne(() => TransactionAmount)
-  @JoinColumn({ name: 'transfer_amount' })
-  transferAmount: TransactionAmount;
+  @Column({ name: 'usdt', nullable: false })
+  usdt: number;
+
+  @Column({ name: 'trx', nullable: false })
+  trx: number;
 
   @Column({
     name: 'status',
     enum: TransactionStatus,
     default: TransactionStatus.Created,
   })
-  status: TransactionStatus;
+  status?: TransactionStatus;
+
+  @Column({
+    name: 'objective',
+    enum: TransactionObjective,
+    default: TransactionObjective.None,
+  })
+  objective?: TransactionObjective;
 }

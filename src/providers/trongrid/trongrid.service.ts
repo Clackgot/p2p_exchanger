@@ -1,34 +1,15 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import applicationConstants from 'src/config/applicationConstants';
-import { RetryOnError } from 'src/decorators/retry-on-error.decorator';
-import { Balance } from 'src/models/balance.model';
-import { TronAccount } from 'src/models/tron-account.model';
-
-// class AddressInfo implements Omit<Balance, 'id'>, Pick<TronAccount, 'address'> {
-//   address: string;
-//   tether: number;
-//   usdt: number;
-//   rub: number;
-// }
-
-class AddressInfo
-  implements Pick<TronAccount, 'address'>, Omit<Balance, 'rub' | 'id'>
-{
-  trx: number;
-  usdt: number;
-  address: string;
-}
+import { TronAccountInfo } from './types';
+import { ITrongridService } from './interfaces';
 
 @Injectable()
-export class TrongridService {
-  private logger: Logger = new Logger(this.constructor.name);
-
+export class TrongridService implements ITrongridService {
   constructor(private readonly httpService: HttpService) {}
 
-  @RetryOnError()
-  async getAddressInfo(address: string): Promise<AddressInfo> {
+  async getTronAccountInfoByAddress(address: string): Promise<TronAccountInfo> {
     const { data } = await firstValueFrom(
       this.httpService.get(`v1/accounts/${address}`),
     );

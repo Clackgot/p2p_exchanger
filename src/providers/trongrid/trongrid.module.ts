@@ -3,6 +3,7 @@ import { TrongridService } from './trongrid.service';
 import { HttpModule } from '@nestjs/axios';
 import applicationConstants from 'src/config/applicationConstants';
 import { errorMessages } from 'src/constants/errorMessages';
+import { TrongridController } from './trongrid.controller';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { errorMessages } from 'src/constants/errorMessages';
   ],
   providers: [TrongridService],
   exports: [TrongridService],
+  controllers: [TrongridController],
 })
 export class TrongridModule {
   private logger = new Logger(this.constructor.name);
@@ -24,7 +26,7 @@ export class TrongridModule {
   constructor(private readonly trongridService: TrongridService) {}
 
   async onModuleInit(): Promise<void> {
-    const addressInfo = await this.trongridService.getAddressInfo(
+    const addressInfo = await this.trongridService.getTronAccountInfoByAddress(
       applicationConstants.STORAGE.ADDRESS,
     );
 

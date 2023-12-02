@@ -5,7 +5,6 @@ import {
   IsUrl,
   IsEnum,
   IsString,
-  IsNumber,
   IsPort,
   IsBoolean,
 } from 'class-validator';
@@ -38,6 +37,15 @@ class DatabaseConfig {
   SYNCHRONIZE: boolean;
 }
 
+class RedisConfig {
+  @IsString()
+  HOST: string;
+  @IsPort()
+  PORT: number;
+  @IsString()
+  PASSWORD: string;
+}
+
 class ApplicationConfig {
   @IsPort()
   PORT: number;
@@ -45,13 +53,13 @@ class ApplicationConfig {
 
 class TelegramBotConfig {
   @IsTelegramBotToken()
-  TELEGRAM_BOT_TOKEN: string;
+  TOKEN: string;
 
   @IsString()
-  TELEGRAM_WEBHOOK_DOMAIN: string;
+  WEBHOOK_DOMAIN: string;
 
   @IsPort()
-  TELEGRAM_WEBHOOK_PORT: number;
+  WEBHOOK_PORT: number;
 }
 
 class TronAccount {
@@ -101,6 +109,8 @@ class ApplicationConstants {
   APP: ApplicationConfig;
 
   DATABASE: DatabaseConfig;
+
+  REDIS: RedisConfig;
 }
 
 let applicationConstants: ApplicationConstants = {
@@ -123,11 +133,9 @@ let applicationConstants: ApplicationConstants = {
   },
 
   TELEGRAM: {
-    TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN as string,
-    TELEGRAM_WEBHOOK_DOMAIN: process.env.TELEGRAM_WEBHOOK_DOMAIN as string,
-    TELEGRAM_WEBHOOK_PORT: parseInt(
-      process.env.TELEGRAM_WEBHOOK_PORT as string,
-    ),
+    TOKEN: process.env.TELEGRAM_BOT_TOKEN as string,
+    WEBHOOK_DOMAIN: process.env.TELEGRAM_WEBHOOK_DOMAIN as string,
+    WEBHOOK_PORT: parseInt(process.env.TELEGRAM_WEBHOOK_PORT as string),
   },
   APP: {
     PORT: parseInt(process.env.APP_PORT as string),
@@ -140,6 +148,12 @@ let applicationConstants: ApplicationConstants = {
     PASSWORD: process.env['DB_PASSWORD'] as string,
     NAME: process.env['DB_NAME'] as string,
     SYNCHRONIZE: Boolean(process.env['DB_SYNCHRONIZE'] as string),
+  },
+
+  REDIS: {
+    HOST: process.env['REDIS_HOST'] as string,
+    PORT: parseInt(process.env['REDIS_PORT'] as string),
+    PASSWORD: process.env['REDIS_PASSWORD'] as string,
   },
 };
 

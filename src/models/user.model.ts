@@ -1,10 +1,13 @@
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { TelegramUser } from './telegram-user.model';
 import { TronAccount } from './tron-account.model';
@@ -25,28 +28,28 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => TelegramUser, {
+  @OneToOne(() => TelegramUser, (telegramUser) => telegramUser.user, {
     nullable: false,
     eager: true,
-    cascade: ['insert', 'update', 'soft-remove', 'recover'],
+    cascade: true,
+    onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'telegram_user' })
   telegramUser: TelegramUser;
 
-  @OneToOne(() => TronAccount, {
+  @OneToOne(() => TronAccount, (tronAccount) => tronAccount.user, {
     nullable: false,
     eager: true,
-    cascade: ['insert', 'update', 'soft-remove', 'recover'],
+    cascade: true,
+    onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'tron_account' })
   tronAccount: TronAccount;
 
-  @OneToOne(() => Balance, {
+  @OneToOne(() => Balance, (balance) => balance.user, {
     nullable: false,
-    cascade: ['insert', 'update', 'soft-remove', 'recover'],
     eager: true,
+    cascade: true,
+    onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'balance' })
   balance: Balance;
 
   @Column({
@@ -59,9 +62,18 @@ export class User {
 
   @OneToMany(() => BankCard, (card) => card.owner, {
     eager: true,
-    cascade: ['insert', 'update', 'soft-remove', 'recover'],
     nullable: true,
+    cascade: true,
   })
-  @JoinColumn({ name: 'bank_cards' })
+  @JoinColumn()
   bankCards: BankCard[];
+
+  @CreateDateColumn()
+  createdDate: Date;
+
+  @UpdateDateColumn()
+  updatedDate: Date;
+
+  @DeleteDateColumn()
+  deletedDate: Date;
 }
