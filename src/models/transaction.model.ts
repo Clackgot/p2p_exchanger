@@ -5,6 +5,7 @@ export enum TransactionStatus {
   Created = 'CREATED',
   Success = 'SUCCESS',
   Revert = 'REVERT',
+  OutOfEnergy = 'OUT_OF_ENERGY',
 }
 
 export enum TransactionObjective {

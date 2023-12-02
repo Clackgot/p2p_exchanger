@@ -67,23 +67,30 @@ export class TronService implements ITronService {
   async getTransactionStatus(id: string): Promise<TransactionStatus> {
     const transactionInfo1 = await this.getTransaction(id);
     const transactionInfo2 = await this.getTransactionInfo(id);
-
     const successCondition1 =
       transactionInfo1?.ret?.[0]?.contractRet === TransactionStatus.Success;
-
     const successCondition2 =
-      JSON.stringify(transactionInfo2?.contractResult) === JSON.stringify(['']);
-
+      JSON.stringify(transactionInfo2?.contractResult) ===
+        JSON.stringify(['']) ||
+      transactionInfo2?.receipt?.result === TransactionStatus.Success;
     const revertCondition1 =
       transactionInfo1?.ret?.[0]?.contractRet === TransactionStatus.Revert;
     const revertCondition2 =
       transactionInfo2?.receipt?.result === TransactionStatus.Revert;
 
-    if (successCondition1 && successCondition2)
+    const outOfEnergyCondition =
+      transactionInfo1?.ret?.[0]?.contractRet === TransactionStatus.OutOfEnergy;
+
+    if (successCondition1 && successCondition2) {
       return TransactionStatus.Success;
+    }
 
-    if (revertCondition1 || revertCondition2) return TransactionStatus.Revert;
-
+    if (revertCondition1 || revertCondition2) {
+      return TransactionStatus.Revert;
+    }
+    if (revertCondition1 || outOfEnergyCondition) {
+      return TransactionStatus.OutOfEnergy;
+    }
     return TransactionStatus.Created;
   }
 }

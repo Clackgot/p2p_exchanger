@@ -57,7 +57,6 @@ export class TronObserverService {
       const transactionStatus = await this.tronService.getTransactionStatus(
         transaction.id,
       );
-
       switch (transactionStatus) {
         case TransactionStatus.Success:
           this.logger.verbose(`Транзакция ${transaction.id} подтверждена`);
@@ -115,6 +114,136 @@ export class TronObserverService {
     throw new NotEnoughAdminsTrxBalancesException();
   }
 
+  @Cron(CronExpression.EVERY_30_SECONDS)
+  async withdrawUsdtFromTraders() {
+    const traders = await this.usersService.getAllTraders();
+    const activatedTradersAccounts = traders.filter(
+      (trader) => trader.tronAccount.isActivated,
+    );
+    if (activatedTradersAccounts.length === 0) {
+      this.logger.verbose(`Активных аккаунтов трейдеров не найдено`);
+    }
+    for (const trader of activatedTradersAccounts) {
+      const transactions = await this.transactionsService.getTransations();
+
+      const transactionExsist = transactions.some(
+        (t) =>
+          t.from.address === trader.tronAccount.address &&
+          t.status === TransactionStatus.Created &&
+          t.objective === TransactionObjective.WithdrawUsdt,
+      );
+
+      if (transactionExsist) {
+        this.logger.verbose(
+          `Транзакция на вывод Tether с аккаунта ${trader.tronAccount.address} уже существует`,
+        );
+        continue;
+      }
+      try {
+        const traderTronAccount = trader.tronAccount;
+        const { tronAccount: adminTronAccount } =
+          await this.getAdminAccountWithValidTrxBalance();
+        const traderTronAccoutInfo =
+          await this.tronService.getTronAccountInfoByAddress(
+            traderTronAccount.address,
+          );
+        const usdtAmount = traderTronAccoutInfo.usdt;
+
+        if (!usdtAmount) {
+          this.logger.verbose(
+            `Баланс USDT аккаунта ${traderTronAccount.address} пуст`,
+          );
+          continue;
+        }
+        const transactionId = await this.tronService.sendUsdt({
+          from: traderTronAccount,
+          to: adminTronAccount,
+          usdt: usdtAmount,
+        });
+        console.log(transactionId);
+        await this.transactionsService.createTransation({
+          id: transactionId,
+          from: traderTronAccount,
+          to: adminTronAccount,
+          trx: 0,
+          usdt: usdtAmount * 1_000_000,
+          status: TransactionStatus.Created,
+          objective: TransactionObjective.WithdrawUsdt,
+        });
+        this.logger.verbose(
+          `Создана транзакция ${transactionId} на перевод ${usdtAmount} USDT с ${traderTronAccount.address} на ${adminTronAccount.address}`,
+        );
+      } catch (error) {
+        this.logger.warn(error);
+      }
+    }
+  }
+
+  @Cron(CronExpression.EVERY_10_SECONDS)
+  async refillTradersTrx() {
+    const traders = await this.usersService.getAllTraders();
+    const activatedTradersAccounts = traders.filter(
+      (trader) => trader.tronAccount.isActivated,
+    );
+    for (const trader of activatedTradersAccounts) {
+      const transactions = await this.transactionsService.getTransations();
+
+      const transactionExsist = transactions.some(
+        (t) =>
+          t.to.address === trader.tronAccount.address &&
+          t.status === TransactionStatus.Created &&
+          t.objective === TransactionObjective.ReplenishingTrx,
+      );
+
+      if (transactionExsist) {
+        this.logger.verbose(
+          `Транзакция на пополение TRX аккаунта ${trader.tronAccount.address} уже существует`,
+        );
+        continue;
+      }
+      try {
+        const traderTronAccount = trader.tronAccount;
+        const { tronAccount: adminTronAccount } =
+          await this.getAdminAccountWithValidTrxBalance();
+        const traderTronAccoutInfo =
+          await this.tronService.getTronAccountInfoByAddress(
+            traderTronAccount.address,
+          );
+        const trxAmount = traderTronAccoutInfo.trx;
+        if (trxAmount > 20) {
+          this.logger.verbose(
+            `Баланс TRX аккаунта ${traderTronAccount.address} не пуст [${trxAmount}]`,
+          );
+          continue;
+        }
+        const trxRefillAmount = 100;
+        console.log(
+          `Начинаем пополение ${traderTronAccount.address} на ${trxRefillAmount}`,
+        );
+        const transactionId = await this.tronService.sendTrx({
+          from: adminTronAccount,
+          to: traderTronAccount,
+          trx: trxRefillAmount,
+        });
+
+        await this.transactionsService.createTransation({
+          id: transactionId,
+          from: adminTronAccount,
+          to: traderTronAccount,
+          trx: trxRefillAmount * 1_000_000,
+          usdt: 0,
+          status: TransactionStatus.Created,
+          objective: TransactionObjective.ReplenishingTrx,
+        });
+        this.logger.verbose(
+          `Создана транзакция ${transactionId} на пополение TRX (${trxRefillAmount}) ${traderTronAccount.address} с баланса ${adminTronAccount.address}`,
+        );
+      } catch (error) {
+        this.logger.warn(error);
+      }
+    }
+  }
+
   /**
    * Создание транзакций на активацию аккаунтов трейдеров, для которых ещё не была инициирована активация
    */
@@ -133,8 +262,10 @@ export class TronObserverService {
       const transactionExsist = transactions.some(
         (t) =>
           (t.to.address === trader.tronAccount.address &&
-            t.status === TransactionStatus.Created) ||
-          (t.status === TransactionStatus.Success &&
+            t.status === TransactionStatus.Created &&
+            t.objective === TransactionObjective.ActivateAccount) ||
+          (t.to.address === trader.tronAccount.address &&
+            t.status === TransactionStatus.Success &&
             t.objective === TransactionObjective.ActivateAccount),
       );
       if (transactionExsist) {
@@ -147,7 +278,7 @@ export class TronObserverService {
         const traderTronAccount = trader.tronAccount;
         const { tronAccount: adminTronAccount } =
           await this.getAdminAccountWithValidTrxBalance();
-        const trxAmount = 0.000001;
+        const trxAmount = 10;
         const transactionId = await this.tronService.sendTrx({
           from: adminTronAccount,
           to: traderTronAccount,
