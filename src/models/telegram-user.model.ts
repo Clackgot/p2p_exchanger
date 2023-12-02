@@ -36,5 +36,6 @@ export class TelegramUser {
     nullable: true,
     onDelete: 'CASCADE',
   })
+  @JoinColumn()
   user: User;
 }

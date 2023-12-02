@@ -31,28 +31,25 @@ export class User {
   @OneToOne(() => TelegramUser, (telegramUser) => telegramUser.user, {
     nullable: false,
     eager: true,
-    cascade: ['insert', 'update'],
+    cascade: true,
     onDelete: 'CASCADE',
   })
-  @JoinColumn()
   telegramUser: TelegramUser;
 
   @OneToOne(() => TronAccount, (tronAccount) => tronAccount.user, {
     nullable: false,
     eager: true,
-    cascade: ['insert', 'update'],
+    cascade: true,
     onDelete: 'CASCADE',
   })
-  @JoinColumn()
   tronAccount: TronAccount;
 
   @OneToOne(() => Balance, (balance) => balance.user, {
     nullable: false,
     eager: true,
-    cascade: ['insert', 'update'],
+    cascade: true,
     onDelete: 'CASCADE',
   })
-  @JoinColumn()
   balance: Balance;
 
   @Column({

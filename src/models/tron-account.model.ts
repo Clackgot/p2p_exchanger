@@ -31,7 +31,8 @@ export class TronAccount {
 
   @OneToOne(() => User, (user) => user.tronAccount, {
     nullable: true,
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
   })
+  @JoinColumn()
   user: User;
 }

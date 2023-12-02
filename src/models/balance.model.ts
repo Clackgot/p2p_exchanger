@@ -1,4 +1,10 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { User } from './user.model';
 
 @Entity({
@@ -21,5 +27,6 @@ export class Balance {
     nullable: true,
     onDelete: 'CASCADE',
   })
+  @JoinColumn()
   user: User;
 }
